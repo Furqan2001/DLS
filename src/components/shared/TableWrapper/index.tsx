@@ -7,11 +7,12 @@ import TableRow from "@mui/material/TableRow";
 import { Button, Collapse, Unstable_Grid2 as Grid } from "@mui/material";
 import { ReactNode, useState } from "react";
 import LoadingButton from "../LoadingButton";
-import { RoleTypes, TGenericObj } from "../../../globals/types";
+
 import ActionButtons, { IActionButton, actionBtnType } from "./ActionButtons";
+import { TGenericObj } from "../../../globals/types";
 
 interface IProps {
-  columns: string[];
+  columns: { key: string; heading: string }[];
   rows: { [key: string]: any }[];
   actionColumn?: boolean;
   //onClickDeleteButton?: (id: string) => void;
@@ -19,8 +20,7 @@ interface IProps {
     align?: "left" | "right" | "center";
     actionButtons: IActionButton[];
   };
-  innerTableColumns?: string[];
-  role?: RoleTypes;
+  innerTableColumns?: { key: string; heading: string }[];
 }
 
 const TableWrapper = ({
@@ -29,7 +29,6 @@ const TableWrapper = ({
   actionColumn,
   innerTableColumns,
   actionColumnConfig,
-  role,
 }: IProps) => {
   const { align = "center", actionButtons } = actionColumnConfig || {};
   const [subCategoryData, setSubCategoryData] = useState<TGenericObj[]>([]);
@@ -56,8 +55,8 @@ const TableWrapper = ({
             <TableHead>
               <TableRow>
                 {columns.map((col) => (
-                  <TableCell key={col} sx={{ fontWeight: "bold" }}>
-                    {col}
+                  <TableCell key={col.key} sx={{ fontWeight: "bold" }}>
+                    {col.heading}
                   </TableCell>
                 ))}
                 {actionColumn && (
@@ -75,16 +74,16 @@ const TableWrapper = ({
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     {columns.map((col) => (
-                      <TableCell key={row[col]} align="left">
-                        {!Array.isArray(row[col]) ? (
-                          typeof row[col] === "boolean" ? (
-                            row[col] ? ( // in case of boolean show string like if prompt approved then show approved and if not then show not approved
+                      <TableCell key={row[col.key]} align="left">
+                        {!Array.isArray(row[col.key]) ? (
+                          typeof row[col.key] === "boolean" ? (
+                            row[col.key] ? ( // in case of boolean show string like if prompt approved then show approved and if not then show not approved
                               col
                             ) : (
                               `Not ${col}`
                             )
                           ) : (
-                            row[col]
+                            row[col.key]
                           )
                         ) : (
                           <Button
@@ -92,7 +91,7 @@ const TableWrapper = ({
                             onClick={() =>
                               isSubcategoryTableShowing
                                 ? resetExpandButton()
-                                : handleExpandButton(row[col], row?.id)
+                                : handleExpandButton(row[col.key], row?.id)
                             }
                           >
                             {isSubcategoryTableShowing
@@ -108,7 +107,6 @@ const TableWrapper = ({
                         <ActionButtons
                           actionButtons={actionButtons}
                           row={row}
-                          role={role}
                         />
                       </TableCell>
                     )}

@@ -1,7 +1,7 @@
 import { RoleTypes, TGenericObj } from "../../../globals/types";
 import LoadingButton from "../LoadingButton";
 
-export type actionBtnType = "more" | "approve" | "delete" | "link";
+export type actionBtnType = "more" | "approve" | "reject" | "delete" | "link";
 export interface IActionButton {
   type: actionBtnType;
   onClick?: (id: string, row: TGenericObj) => void;
@@ -10,8 +10,10 @@ export interface IActionButton {
 }
 
 const getActionBtnColor = (type: actionBtnType) => {
-  if (type === "delete") return "error"; // red color will show
+  if (type === "delete" || type === "reject")
+    return "error"; // red color will show
   else if (type === "approve") return "primary";
+
   return "info";
 };
 

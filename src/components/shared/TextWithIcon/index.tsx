@@ -41,12 +41,13 @@ const TextWithIcon = ({
           : linkColor === "primary"
           ? "primary.main"
           : "secondary.main",
+
         ...sx,
       }}
       {...optionalProps}
     >
       <ListItem disablePadding>
-        {icon && <ListItemIcon sx={iconSx}>{icon}</ListItemIcon>}
+        {icon && <ListItemIcon sx={{ ...(iconSx || {}) }}>{icon}</ListItemIcon>}
         <ListItemText sx={textStyle} primary={text} />
         {endIcon && <ListItemIcon sx={iconSx}>{endIcon}</ListItemIcon>}
       </ListItem>

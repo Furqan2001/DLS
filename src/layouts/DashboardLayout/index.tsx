@@ -55,7 +55,14 @@ const DashboardLayout = ({
   });
 
   return (
-    <Box sx={{ display: "flex", p: 0 }}>
+    <Box
+      sx={{
+        display: "flex",
+        p: 0,
+        background: "white", //"#f7f4f2ff",
+        minHeight: "100vh",
+      }}
+    >
       <CssBaseline />
       <AppBar
         sx={{
@@ -122,6 +129,7 @@ const DashboardLayout = ({
               key={item.id}
               icon={<item.Icon fontSize="small" />}
               link={item.link}
+              iconSx={{ marginRight: 0 }}
               sx={{
                 height: !open ? undefined : 48,
                 width: !open ? undefined : 194,
@@ -129,7 +137,7 @@ const DashboardLayout = ({
                 my: 3,
                 // p: !open ? 2 : undefined,
                 borderRadius: !open ? undefined : 3,
-                ...getSelectedNavigationItemSx(location.pathname === item.link),
+                //  ...getSelectedNavigationItemSx(location.pathname === item.link),
               }}
               text={!open ? "" : item.text}
             />

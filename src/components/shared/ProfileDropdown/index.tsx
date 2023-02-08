@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Button } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -18,8 +19,8 @@ const ProfileDropdown = () => {
 
   const list = [
     { id: 1, text: "Home", link: "/" },
-    // { id: 2, text: "Settings", link: UrlsList.dashboardSettings },
-    { id: 3, text: "Sign Out", onClick: () => {} },
+    { id: 2, text: "Settings", link: UrlsList.dashboardSettings },
+    { id: 3, text: "Sign Out" },
   ];
 
   return (
