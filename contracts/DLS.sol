@@ -7,14 +7,16 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract DLS {
     using Counters for Counters.Counter;
     Counters.Counter private _itemIds;
+    Counters.Counter private totalModerators;
     Counters.Counter private totalAdmins;
-    Counters.Counter private totalHeadAdmins;
 
     struct UserItem {
         address userAddress;
         bool isRegistered;
+        uint256 modApprovals;
+        bool isModerator;
+        uint256 adminApprovals;
         bool isAdmin;
-        bool isHeadAdmin;
     }
 
     address[] usersAddresses;
@@ -36,19 +38,19 @@ contract DLS {
     mapping(uint256 => PropertyItem) private idToPropertyItem;
     mapping(uint256 => PropertyItem) private ownershipChangeItems;
 
+    modifier verifiedModerator() {
+        require(users[msg.sender].isModerator, "Unauthorized Access");
+        _;
+    }
+
     modifier verifiedAdmin() {
         require(users[msg.sender].isAdmin, "Unauthorized Access");
         _;
     }
 
-    modifier verifiedHeadAdmin() {
-        require(users[msg.sender].isHeadAdmin, "Unauthorized Access");
-        _;
-    }
-
-    modifier verifiedAdminORHeadAdmin() {
+    modifier verifiedModeratorORAdmin() {
         require(
-            users[msg.sender].isAdmin || users[msg.sender].isHeadAdmin,
+            users[msg.sender].isModerator || users[msg.sender].isAdmin,
             "Unauthorized Access"
         );
         _;
@@ -56,8 +58,8 @@ contract DLS {
 
     constructor() {
         usersAddresses.push(msg.sender);
-        users[msg.sender] = UserItem(msg.sender, true, false, true);
-        totalHeadAdmins.increment();
+        users[msg.sender] = UserItem(msg.sender, true, 0, false, 0, true);
+        totalAdmins.increment();
     }
 
     // User Functions
@@ -67,35 +69,45 @@ contract DLS {
         require(!users[msg.sender].isRegistered, "User already exists!");
 
         usersAddresses.push(msg.sender);
-        users[msg.sender] = UserItem(msg.sender, true, false, false);
+        users[msg.sender] = UserItem(msg.sender, true, 0, false, 0, false);
         return true;
     }
 
-    // Make new Admin
+    // Make new Moderator
+    function addNewModerator(address _newModerator)
+        public
+        verifiedAdmin
+        returns (bool)
+    {
+        require(users[_newModerator].isRegistered, "User does not exist!");
+        require(!users[_newModerator].isModerator, "User already Moderator!");
+
+        uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
+        users[_newModerator].modApprovals++;
+
+        if (users[_newModerator].modApprovals >= majorityAdminCount) {
+            users[_newModerator].isModerator = true;
+            totalModerators.increment();
+        }
+        return true;
+    }
+
+    //Make new Admin
     function addNewAdmin(address _newAdmin)
         public
-        verifiedHeadAdmin
+        verifiedAdmin
         returns (bool)
     {
         require(users[_newAdmin].isRegistered, "User does not exist!");
         require(!users[_newAdmin].isAdmin, "User already Admin!");
 
-        users[_newAdmin].isAdmin = true;
-        totalAdmins.increment();
-        return true;
-    }
+        uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
+        users[_newAdmin].adminApprovals++;
 
-    //Make new Head Admin
-    function addNewHeadAdmin(address _newHeadAdmin)
-        public
-        verifiedHeadAdmin
-        returns (bool)
-    {
-        require(users[_newHeadAdmin].isRegistered, "User does not exist!");
-        require(!users[_newHeadAdmin].isHeadAdmin, "User already Head Admin!");
-
-        users[_newHeadAdmin].isHeadAdmin = true;
-        totalHeadAdmins.increment();
+        if (users[_newAdmin].adminApprovals >= majorityAdminCount) {
+            users[_newAdmin].isAdmin = true;
+            totalAdmins.increment();
+        }
         return true;
     }
 
@@ -108,7 +120,7 @@ contract DLS {
     function fetchAllUsers()
         public
         view
-        verifiedAdminORHeadAdmin
+        verifiedModeratorORAdmin
         returns (UserItem[] memory)
     {
         uint256 allUsersCount = usersAddresses.length;
@@ -123,11 +135,36 @@ contract DLS {
         return allUsers;
     }
 
-    // fetch all admins
+    // fetch all Moderators
+    function fetchAllModerators()
+        public
+        view
+        verifiedAdmin
+        returns (UserItem[] memory)
+    {
+        uint256 allUsersCount = usersAddresses.length;
+        uint256 currentIndex = 0;
+
+        UserItem[] memory allModerators = new UserItem[](
+            totalModerators.current()
+        );
+        for (uint256 i = 0; i < allUsersCount; i++) {
+            address UAddress = usersAddresses[i];
+            if (users[UAddress].isModerator == true) {
+                UserItem storage currentUser = users[UAddress];
+                allModerators[currentIndex] = currentUser;
+                currentIndex++;
+            }
+        }
+
+        return allModerators;
+    }
+
+    // fetch all Admins
     function fetchAllAdmins()
         public
         view
-        verifiedHeadAdmin
+        verifiedAdmin
         returns (UserItem[] memory)
     {
         uint256 allUsersCount = usersAddresses.length;
@@ -146,35 +183,13 @@ contract DLS {
         return allAdmins;
     }
 
-    // fetch all headAdmins
-    function fetchAllHeadAdmins()
-        public
-        view
-        verifiedHeadAdmin
-        returns (UserItem[] memory)
-    {
-        uint256 allUsersCount = usersAddresses.length;
-        uint256 currentIndex = 0;
-
-        UserItem[] memory allHeadAdmins = new UserItem[](
-            totalHeadAdmins.current()
-        );
-        for (uint256 i = 0; i < allUsersCount; i++) {
-            address UAddress = usersAddresses[i];
-            if (users[UAddress].isHeadAdmin == true) {
-                UserItem storage currentUser = users[UAddress];
-                allHeadAdmins[currentIndex] = currentUser;
-                currentIndex++;
-            }
-        }
-
-        return allHeadAdmins;
-    }
-
     // Property Functions
 
     // Create a New Property
-    function createProperty(string memory _ipfsHashValue) public verifiedAdmin {
+    function createProperty(string memory _ipfsHashValue)
+        public
+        verifiedModerator
+    {
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
 
@@ -186,7 +201,7 @@ contract DLS {
     }
 
     // Approve a Property
-    function approveProperty(uint256 _itemId) public verifiedHeadAdmin {
+    function approveProperty(uint256 _itemId) public verifiedAdmin {
         require(
             idToPropertyItem[_itemId].status == Status.Pending,
             "Property already Approved or Rejected"
@@ -195,7 +210,7 @@ contract DLS {
     }
 
     // Reject a Property
-    function rejectProperty(uint256 _itemId) public verifiedHeadAdmin {
+    function rejectProperty(uint256 _itemId) public verifiedAdmin {
         require(
             idToPropertyItem[_itemId].status == Status.Pending,
             "Property already Approved or Rejected"
@@ -207,7 +222,7 @@ contract DLS {
     // Change Ownership of Property
     function changeOwnership(uint256 _itemId, string memory _ipfsHashValue)
         public
-        verifiedAdmin
+        verifiedModerator
     {
         require(
             idToPropertyItem[_itemId].status == Status.Approved,
@@ -223,7 +238,7 @@ contract DLS {
     }
 
     // Approve Change of Property Ownership
-    function approveOwnershipChange(uint256 _itemId) public verifiedHeadAdmin {
+    function approveOwnershipChange(uint256 _itemId) public verifiedAdmin {
         idToPropertyItem[_itemId].status = Status.Approved;
         // idToPropertyItem[_itemId].ipfsHash = ownershipChangeItems[_itemId]
         //     .ipfsHash;
@@ -231,7 +246,7 @@ contract DLS {
     }
 
     // Reject Change of Property Ownership
-    function rejectOwnershipChange(uint256 _itemId) public verifiedHeadAdmin {
+    function rejectOwnershipChange(uint256 _itemId) public verifiedAdmin {
         idToPropertyItem[_itemId].status = Status.Approved;
         idToPropertyItem[_itemId].ipfsHash = ownershipChangeItems[_itemId]
             .ipfsHash;
@@ -289,7 +304,7 @@ contract DLS {
     function fetchAllRejectedProperties()
         public
         view
-        verifiedAdminORHeadAdmin
+        verifiedModeratorORAdmin
         returns (PropertyItem[] memory)
     {
         uint256 itemCount = _itemIds.current();
@@ -321,7 +336,7 @@ contract DLS {
     function fetchAllPendingProperties()
         public
         view
-        verifiedAdminORHeadAdmin
+        verifiedModeratorORAdmin
         returns (PropertyItem[] memory)
     {
         uint256 itemCount = _itemIds.current();
@@ -337,6 +352,7 @@ contract DLS {
         PropertyItem[] memory properties = new PropertyItem[](
             pendingPropertyCount
         );
+
         for (uint256 i = 0; i < itemCount; i++) {
             if (idToPropertyItem[i + 1].status == Status.Pending) {
                 uint256 currentId = i + 1;
@@ -353,7 +369,7 @@ contract DLS {
     function fetchAllUnderReviewProperties()
         public
         view
-        verifiedAdminORHeadAdmin
+        verifiedModeratorORAdmin
         returns (PropertyItem[] memory)
     {
         uint256 itemCount = _itemIds.current();
@@ -369,6 +385,7 @@ contract DLS {
         PropertyItem[] memory properties = new PropertyItem[](
             underReviewPropertyCount
         );
+
         for (uint256 i = 0; i < itemCount; i++) {
             if (idToPropertyItem[i + 1].status == Status.UnderChangeReview) {
                 uint256 currentId = i + 1;
