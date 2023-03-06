@@ -4,7 +4,8 @@ import { DLSAddress } from "../constants/contractAddress";
 import Web3Modal from "web3modal";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { URLS } from "../../@core/enums";
+import { LOCAL_STORAGE_KEYS, URLS } from "../../@core/globals/enums";
+import { saveData } from "../../@core/helpers/localStorage";
 
 const abi = DLSJSON.abi;
 
@@ -14,6 +15,8 @@ const fetchContract = (signerOrProvider: ethers.providers.JsonRpcSigner) =>
 const useContract = () => {
   const [contract, setContract] = useState<ethers.Contract>();
   const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState();
+
   const router = useRouter();
   const fetchContractDetails = async () => {
     try {
@@ -31,7 +34,7 @@ const useContract = () => {
     return contract;
   };
 
-  const loginUser = async () => {
+  const loginUser = async (currentAccountAddress: string) => {
     const contract = await fetchContractDetails();
     if (!contract) {
       setLoading(false);
@@ -50,7 +53,8 @@ const useContract = () => {
         return;
       }
     }
-
+    
+    saveData(LOCAL_STORAGE_KEYS.web3AccountAddress, currentAccountAddress);
     router.push(URLS.dashboard);
   };
 

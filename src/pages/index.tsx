@@ -8,13 +8,9 @@ import { useRouter } from "next/router";
 // ** MUI Components
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
 import CardContent from "@mui/material/CardContent";
-import FormControl from "@mui/material/FormControl";
-import OutlinedInput from "@mui/material/OutlinedInput";
 import { styled, useTheme } from "@mui/material/styles";
 import MuiCard, { CardProps } from "@mui/material/Card";
-import InputAdornment from "@mui/material/InputAdornment";
 import MuiFormControlLabel, {
   FormControlLabelProps,
 } from "@mui/material/FormControlLabel";
@@ -37,7 +33,7 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 // ** Demo Imports
 import FooterIllustrationsV1 from "src/views/pages/auth/FooterIllustration";
 import { useDLSContext } from "../common/context/DLSContext";
-import { URLS } from "../@core/enums";
+import { URLS } from "../@core/globals/enums";
 import LoadingButton from "../@core/components/shared/LoadingButton";
 
 interface State {

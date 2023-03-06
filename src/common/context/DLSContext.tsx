@@ -5,6 +5,8 @@ import { ContractInterface, ethers, providers } from "ethers";
 import { DLSAddress } from "../constants/contractAddress";
 import Web3Modal from "web3modal";
 import useContract from "../hooks/useContract";
+import { getData } from "../../@core/helpers/localStorage";
+import { LOCAL_STORAGE_KEYS } from "../../@core/globals/enums";
 
 const initialValue = {
   connectToWallet: () => {},
@@ -22,14 +24,16 @@ export const useDLSContext = () => {
 export const DLSContextProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [err, setErr] = useState(null);
-  const { fetchContractDetails, loginUser, loading, setLoading } = useContract();
+
+  const { fetchContractDetails, loginUser, loading, setLoading } =
+    useContract();
 
   const accountChangedHandler = async (newAccount) => {
     const address = await newAccount.getAddress();
     setCurrentAccount(address);
     const balance = await newAccount.getBalance();
 
-    await loginUser();
+    await loginUser(address);
   };
 
   const connectToWallet = async () => {
@@ -47,11 +51,20 @@ export const DLSContextProvider = ({ children }) => {
 
       await accountChangedHandler(provider.getSigner());
     } catch (err) {
-     
       console.log("err in connectToWallet ", err);
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    (async () => {
+      const address = getData(LOCAL_STORAGE_KEYS.web3AccountAddress);
+      if (!!address) {
+        await loginUser(address);
+        setCurrentAccount(address);
+      }
+    })();
+  }, []);
 
   return (
     <DLSContext.Provider

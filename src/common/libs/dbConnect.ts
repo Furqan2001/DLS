@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 
 const MONGODB_URI =
-  "mongodb+srv://user:UO3uv1iWGJ8BoZ2D@cluster0.vudxyeg.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://user:UO3uv1iWGJ8BoZ2D@cluster1.qfcdrhz.mongodb.net/?retryWrites=true&w=majority";
 
 if (!MONGODB_URI) {
   throw new Error(
