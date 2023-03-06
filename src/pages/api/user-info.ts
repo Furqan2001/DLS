@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import dbConnect from "../../libs/dbConnect";
-import User from "../../models/User";
+import dbConnect from "../../common/libs/dbConnect";
+import User from "../../common/modals/User";
 import AWS from "aws-sdk";
 import multiparty from "multiparty";
 import fs from "fs";
