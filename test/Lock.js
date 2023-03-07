@@ -5,7 +5,7 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 
-describe("Lock", function () {
+describe("DLS", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
@@ -19,31 +19,31 @@ describe("Lock", function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await ethers.getSigners();
 
-    const Lock = await ethers.getContractFactory("Lock");
-    const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+    const DLS = await ethers.getContractFactory("DLS");
+    const dls = await DLS.deploy();
 
-    return { lock, unlockTime, lockedAmount, owner, otherAccount };
+    return { dls, unlockTime, lockedAmount, owner, otherAccount };
   }
 
   describe("Deployment", function () {
     it("Should set the right unlockTime", async function () {
-      const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
+      const { dls, unlockTime } = await loadFixture(deployOneYearLockFixture);
 
-      expect(await lock.unlockTime()).to.equal(unlockTime);
+      expect(await dls.unlockTime()).to.equal(unlockTime);
     });
 
     it("Should set the right owner", async function () {
-      const { lock, owner } = await loadFixture(deployOneYearLockFixture);
+      const { dls, owner } = await loadFixture(deployOneYearLockFixture);
 
-      expect(await lock.owner()).to.equal(owner.address);
+      expect(await dls.owner()).to.equal(owner.address);
     });
 
     it("Should receive and store the funds to lock", async function () {
-      const { lock, lockedAmount } = await loadFixture(
+      const { dls, lockedAmount } = await loadFixture(
         deployOneYearLockFixture
       );
 
-      expect(await ethers.provider.getBalance(lock.address)).to.equal(
+      expect(await ethers.provider.getBalance(dls.address)).to.equal(
         lockedAmount
       );
     });

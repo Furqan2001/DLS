@@ -1,8 +1,21 @@
+"use client";
+import { useEffect } from "react";
 import { Box, Card, Typography, TextField, Button } from "@mui/material";
 import TextWithIcon from "../shared/TextWithIcon";
 import Link from "next/link";
+import { useDLSContext } from "../../context/DLSContext";
+import { useRouter } from "next/navigation";
 
 const ConnectWallet = () => {
+  const { connectToWallet, currentAccount } = useDLSContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!currentAccount) return;
+
+    router.push("/dashboard");
+  }, [currentAccount]);
+
   return (
     <Card
       sx={{
@@ -21,26 +34,8 @@ const ConnectWallet = () => {
       </Box>
 
       <Box sx={{ py: 2, px: 5 }}>
-        {/* <Button
-          startIcon={
-          
-          }
-        >
-          Connect to MetaMask
-        </Button> */}
-        {/* <TextField
-          fullWidth
-          placeholder="Enter Wallet Address"
-          InputProps={{
-            sx: { fontSize: 14, borderRadius: 30, background: "#EFEFEF" },
-          }}
-          inputProps={{ sx: { borderRadisu: 30 } }}
-        /> */}
-
         <Button
           variant="outlined"
-          LinkComponent={Link}
-          href="/dashboard"
           fullWidth
           startIcon={
             <img
@@ -55,6 +50,10 @@ const ConnectWallet = () => {
             mt: { xs: 4, xl: 7 },
             fontSize: "1rem",
             fontWeight: 500,
+          }}
+          onClick={() => {
+            console.log("onClick occured ");
+            connectToWallet();
           }}
         >
           Connect To MetaMask
