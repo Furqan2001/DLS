@@ -13,14 +13,19 @@ contract DLS {
     struct UserItem {
         address userAddress;
         bool isRegistered;
-        uint256 modApprovals;
-        bool isModerator;
-        uint256 adminApprovals;
-        bool isAdmin;
+        Role role;
+        address[] modApprovals;
+        address[] adminApprovals;
     }
 
     address[] usersAddresses;
     mapping(address => UserItem) users;
+
+    enum Role {
+        Visitor,
+        Moderator,
+        Admin
+    }
 
     enum Status {
         Pending,
@@ -39,18 +44,22 @@ contract DLS {
     mapping(uint256 => PropertyItem) private ownershipChangeItems;
 
     modifier verifiedModerator() {
-        require(users[msg.sender].isModerator, "Unauthorized Access");
+        require(
+            users[msg.sender].role == Role.Moderator,
+            "Unauthorized Access"
+        );
         _;
     }
 
     modifier verifiedAdmin() {
-        require(users[msg.sender].isAdmin, "Unauthorized Access");
+        require(users[msg.sender].role == Role.Admin, "Unauthorized Access");
         _;
     }
 
     modifier verifiedModeratorORAdmin() {
         require(
-            users[msg.sender].isModerator || users[msg.sender].isAdmin,
+            users[msg.sender].role == Role.Moderator ||
+                users[msg.sender].role == Role.Admin,
             "Unauthorized Access"
         );
         _;
@@ -58,7 +67,12 @@ contract DLS {
 
     constructor() {
         usersAddresses.push(msg.sender);
-        users[msg.sender] = UserItem(msg.sender, true, 0, false, 0, true);
+
+        UserItem memory uItem;
+        uItem.userAddress = msg.sender;
+        uItem.isRegistered = true;
+        uItem.role = Role.Admin;
+        users[msg.sender] = uItem;
         totalAdmins.increment();
     }
 
@@ -68,8 +82,14 @@ contract DLS {
     function registerNewUser() public returns (bool) {
         require(!users[msg.sender].isRegistered, "User already exists!");
 
+        UserItem memory uItem;
+        uItem.userAddress = msg.sender;
+        uItem.isRegistered = true;
+        uItem.role = Role.Visitor;
+        users[msg.sender] = uItem;
+
         usersAddresses.push(msg.sender);
-        users[msg.sender] = UserItem(msg.sender, true, 0, false, 0, false);
+        users[msg.sender] = uItem;
         return true;
     }
 
@@ -80,13 +100,23 @@ contract DLS {
         returns (bool)
     {
         require(users[_newModerator].isRegistered, "User does not exist!");
-        require(!users[_newModerator].isModerator, "User already Moderator!");
+        require(
+            users[_newModerator].role == Role.Visitor,
+            "User cannot be promoted to a Moderator!"
+        );
 
         uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
-        users[_newModerator].modApprovals++;
 
-        if (users[_newModerator].modApprovals >= majorityAdminCount) {
-            users[_newModerator].isModerator = true;
+        for (uint256 i = 0; i < users[_newModerator].modApprovals.length; i++) {
+            if (users[_newModerator].modApprovals[i] == msg.sender) {
+                revert();
+            }
+        }
+
+        users[_newModerator].modApprovals.push(msg.sender);
+
+        if (users[_newModerator].modApprovals.length >= majorityAdminCount) {
+            users[_newModerator].role = Role.Moderator;
             totalModerators.increment();
         }
         return true;
@@ -99,13 +129,22 @@ contract DLS {
         returns (bool)
     {
         require(users[_newAdmin].isRegistered, "User does not exist!");
-        require(!users[_newAdmin].isAdmin, "User already Admin!");
+        require(
+            users[_newAdmin].role == Role.Moderator,
+            "User cannot be promoted to an Admin!"
+        );
 
         uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
-        users[_newAdmin].adminApprovals++;
 
-        if (users[_newAdmin].adminApprovals >= majorityAdminCount) {
-            users[_newAdmin].isAdmin = true;
+        for (uint256 i = 0; i < users[_newAdmin].adminApprovals.length; i++) {
+            if (users[_newAdmin].adminApprovals[i] == msg.sender) {
+                revert();
+            }
+        }
+        users[_newAdmin].adminApprovals.push(msg.sender);
+
+        if (users[_newAdmin].adminApprovals.length >= majorityAdminCount) {
+            users[_newAdmin].role = Role.Admin;
             totalAdmins.increment();
         }
         return true;
@@ -150,7 +189,7 @@ contract DLS {
         );
         for (uint256 i = 0; i < allUsersCount; i++) {
             address UAddress = usersAddresses[i];
-            if (users[UAddress].isModerator == true) {
+            if (users[UAddress].role == Role.Moderator) {
                 UserItem storage currentUser = users[UAddress];
                 allModerators[currentIndex] = currentUser;
                 currentIndex++;
@@ -158,6 +197,11 @@ contract DLS {
         }
 
         return allModerators;
+    }
+
+    // Returns the number of majority
+    function getMajorityAdminCount() public view returns (uint256) {
+        return ((totalAdmins.current() / 2) + 1);
     }
 
     // fetch all Admins
@@ -173,7 +217,7 @@ contract DLS {
         UserItem[] memory allAdmins = new UserItem[](totalAdmins.current());
         for (uint256 i = 0; i < allUsersCount; i++) {
             address UAddress = usersAddresses[i];
-            if (users[UAddress].isAdmin == true) {
+            if (users[UAddress].role == Role.Admin) {
                 UserItem storage currentUser = users[UAddress];
                 allAdmins[currentIndex] = currentUser;
                 currentIndex++;
