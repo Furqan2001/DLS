@@ -18,6 +18,15 @@ contract DLS {
         address[] adminApprovals;
     }
 
+    struct UserReturnItem {
+        address userAddress;
+        Role role;
+        address[] modApprovals;
+        uint256 modApprovalsLeft;
+        address[] adminApprovals;
+        uint256 adminApprovalsLeft;
+    }
+
     address[] usersAddresses;
     mapping(address => UserItem) users;
 
@@ -151,8 +160,22 @@ contract DLS {
     }
 
     // get a specific user
-    function getUser() public view returns (UserItem memory) {
-        return users[msg.sender];
+    function getUser() public view returns (UserReturnItem memory) {
+        uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
+
+        UserReturnItem memory userItem;
+        userItem.userAddress = users[msg.sender].userAddress;
+        userItem.role = users[msg.sender].role;
+        userItem.modApprovals = users[msg.sender].modApprovals;
+        userItem.modApprovalsLeft =
+            majorityAdminCount -
+            users[msg.sender].modApprovals.length;
+        userItem.adminApprovals = users[msg.sender].adminApprovals;
+        userItem.adminApprovalsLeft =
+            majorityAdminCount -
+            users[msg.sender].adminApprovals.length;
+
+        return userItem;
     }
 
     // fetch all registered Users
@@ -197,11 +220,6 @@ contract DLS {
         }
 
         return allModerators;
-    }
-
-    // Returns the number of majority
-    function getMajorityAdminCount() public view returns (uint256) {
-        return ((totalAdmins.current() / 2) + 1);
     }
 
     // fetch all Admins
