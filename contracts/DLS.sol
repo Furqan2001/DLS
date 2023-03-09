@@ -75,13 +75,13 @@ contract DLS {
     }
 
     constructor() {
-        usersAddresses.push(msg.sender);
-
         UserItem memory uItem;
         uItem.userAddress = msg.sender;
         uItem.isRegistered = true;
         uItem.role = Role.Admin;
         users[msg.sender] = uItem;
+
+        usersAddresses.push(msg.sender);
         totalAdmins.increment();
     }
 
@@ -103,11 +103,9 @@ contract DLS {
     }
 
     // Make new Moderator
-    function addNewModerator(address _newModerator)
-        public
-        verifiedAdmin
-        returns (bool)
-    {
+    function addNewModerator(
+        address _newModerator
+    ) public verifiedAdmin returns (bool) {
         require(users[_newModerator].isRegistered, "User does not exist!");
         require(
             users[_newModerator].role == Role.Visitor,
@@ -132,11 +130,9 @@ contract DLS {
     }
 
     //Make new Admin
-    function addNewAdmin(address _newAdmin)
-        public
-        verifiedAdmin
-        returns (bool)
-    {
+    function addNewAdmin(
+        address _newAdmin
+    ) public verifiedAdmin returns (bool) {
         require(users[_newAdmin].isRegistered, "User does not exist!");
         require(
             users[_newAdmin].role == Role.Moderator,
@@ -159,21 +155,28 @@ contract DLS {
         return true;
     }
 
-    // get a specific user
+    // get the logged in user
     function getUser() public view returns (UserReturnItem memory) {
+        return fetchSingleUser(msg.sender);
+    }
+
+    // fetch a specific user
+    function fetchSingleUser(
+        address userAddress
+    ) public view verifiedAdmin returns (UserReturnItem memory) {
         uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
 
         UserReturnItem memory userItem;
-        userItem.userAddress = users[msg.sender].userAddress;
-        userItem.role = users[msg.sender].role;
-        userItem.modApprovals = users[msg.sender].modApprovals;
+        userItem.userAddress = users[userAddress].userAddress;
+        userItem.role = users[userAddress].role;
+        userItem.modApprovals = users[userAddress].modApprovals;
         userItem.modApprovalsLeft =
             majorityAdminCount -
-            users[msg.sender].modApprovals.length;
-        userItem.adminApprovals = users[msg.sender].adminApprovals;
+            users[userAddress].modApprovals.length;
+        userItem.adminApprovals = users[userAddress].adminApprovals;
         userItem.adminApprovalsLeft =
             majorityAdminCount -
-            users[msg.sender].adminApprovals.length;
+            users[userAddress].adminApprovals.length;
 
         return userItem;
     }
@@ -248,10 +251,9 @@ contract DLS {
     // Property Functions
 
     // Create a New Property
-    function createProperty(string memory _ipfsHashValue)
-        public
-        verifiedModerator
-    {
+    function createProperty(
+        string memory _ipfsHashValue
+    ) public verifiedModerator {
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
 
@@ -282,10 +284,10 @@ contract DLS {
     }
 
     // Change Ownership of Property
-    function changeOwnership(uint256 _itemId, string memory _ipfsHashValue)
-        public
-        verifiedModerator
-    {
+    function changeOwnership(
+        uint256 _itemId,
+        string memory _ipfsHashValue
+    ) public verifiedModerator {
         require(
             idToPropertyItem[_itemId].status == Status.Approved,
             "Property does not Exist or Has Not Been Approved"
