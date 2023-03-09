@@ -157,7 +157,21 @@ contract DLS {
 
     // get the logged in user
     function getUser() public view returns (UserReturnItem memory) {
-        return fetchSingleUser(msg.sender);
+        uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
+
+        UserReturnItem memory userItem;
+        userItem.userAddress = users[msg.sender].userAddress;
+        userItem.role = users[msg.sender].role;
+        userItem.modApprovals = users[msg.sender].modApprovals;
+        userItem.modApprovalsLeft =
+            majorityAdminCount -
+            users[msg.sender].modApprovals.length;
+        userItem.adminApprovals = users[msg.sender].adminApprovals;
+        userItem.adminApprovalsLeft =
+            majorityAdminCount -
+            users[msg.sender].adminApprovals.length;
+
+        return userItem;
     }
 
     // fetch a specific user
