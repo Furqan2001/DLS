@@ -2,10 +2,10 @@ import axios from "axios";
 import { IUserInfo } from "../../@core/globals/types";
 
 export const fetchUserInfo: (
-  web3AccountAddress: string
-) => Promise<IUserInfo> = async (web3AccountAddress: string) => {
+  accountAddress: string
+) => Promise<IUserInfo> = async (accountAddress: string) => {
   const res = await axios.get(
-    `/api/user-info?web3AccountAddress=${web3AccountAddress}`
+    `/api/user-info?accountAddress=${accountAddress}`
   );
   return res.data.user;
 };

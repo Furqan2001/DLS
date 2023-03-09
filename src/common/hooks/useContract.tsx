@@ -53,12 +53,29 @@ const useContract = () => {
         return;
       }
     }
-    
-    saveData(LOCAL_STORAGE_KEYS.web3AccountAddress, currentAccountAddress);
+
+    saveData(LOCAL_STORAGE_KEYS.accountAddress, currentAccountAddress);
     router.push(URLS.dashboard);
   };
 
-  return { fetchContractDetails, loginUser, contract, loading, setLoading };
+  const fetchAllUsers = async () => {
+    let users = [];
+    try {
+      users = await contract.fetchAllUsers();
+    } catch (err) {
+      console.log("err in fetching all the users ", contract, err);
+    }
+    return users;
+  };
+
+  return {
+    fetchContractDetails,
+    loginUser,
+    fetchAllUsers,
+    contract,
+    loading,
+    setLoading,
+  };
 };
 
 export default useContract;

@@ -11,7 +11,7 @@ interface IUser {
   name: string;
   email: string;
   avatar?: string;
-  web3AccountAddress: string;
+  accountAddress: string;
   username: string;
   bio?: string;
   phoneNumber?: string;
@@ -29,7 +29,7 @@ const userSchema = new Schema<IUser>({
   name: { type: String },
   email: { type: String },
   username: { type: String },
-  web3AccountAddress: { type: String, required: true },
+  accountAddress: { type: String, required: true },
   avatar: String,
   bio: String,
   phoneNumber: String,

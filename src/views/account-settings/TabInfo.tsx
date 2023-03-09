@@ -60,7 +60,7 @@ const TabInfo = ({ userInfo }: IProps) => {
     setLoading(true);
 
     const formData = new FormData();
-    formData.append("web3AccountAddress", currentAccount);
+    formData.append("accountAddress", currentAccount);
     formData.append("bio", formState.bio);
     formData.append("birthDate", formState.birthDate);
     formData.append("phoneNumber", formState.phoneNumber);

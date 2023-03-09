@@ -37,15 +37,15 @@ const uploadFilesToS3 = async (file) => {
 };
 
 const updateUserInfo = async (data) => {
-  if (!data?.web3AccountAddress) {
+  if (!data?.accountAddress) {
     throw {
       code: 400,
-      message: "web3AccountAddress field is required",
+      message: "accountAddress field is required",
     };
   }
 
   const {
-    web3AccountAddress,
+    accountAddress,
     name,
     email,
     avatar,
@@ -58,13 +58,13 @@ const updateUserInfo = async (data) => {
 
   // remove Undefined key from obj
 
-  const userObj = { web3AccountAddress };
+  const userObj = { accountAddress };
   Object.keys(data).map((k) => {
     userObj[k] = k;
   });
 
   try {
-    let user: any = await User.findOne({ web3AccountAddress });
+    let user: any = await User.findOne({ accountAddress });
 
     if (user) {
       user.name = name || user.name;
@@ -77,7 +77,7 @@ const updateUserInfo = async (data) => {
       user.gender = gender || user.gender;
     } else {
       user = new User({
-        web3AccountAddress,
+        accountAddress,
         name,
         email,
         avatar,
@@ -110,7 +110,7 @@ const parseForm = (req) => {
       }
 
       const name = fields.name?.[0];
-      const web3AccountAddress = fields.web3AccountAddress?.[0];
+      const accountAddress = fields.accountAddress?.[0];
       const email = fields.email?.[0];
       const username = fields.username?.[0];
       const bio = fields.bio?.[0];
@@ -128,7 +128,7 @@ const parseForm = (req) => {
           avatar = await uploadFilesToS3(files[0]);
         }
         await updateUserInfo({
-          web3AccountAddress,
+          accountAddress,
           name,
           email,
           avatar,
@@ -146,15 +146,15 @@ const parseForm = (req) => {
   });
 };
 
-const fetchUserInfo = async (web3AccountAddress: string) =>
-  User.findOne({ web3AccountAddress });
+const fetchUserInfo = async (accountAddress: string) =>
+  User.findOne({ accountAddress });
 
 const updateUserBioInfo = async (req: NextApiRequest) => {
-  const { web3AccountAddress, bio, phoneNumber, birthDate, gender } =
+  const { accountAddress, bio, phoneNumber, birthDate, gender } =
     req.body.bioInfo;
 
   try {
-    let user = await User.findOne({ web3AccountAddress });
+    let user = await User.findOne({ accountAddress });
 
     if (user) {
       user.bio = bio;
@@ -163,7 +163,7 @@ const updateUserBioInfo = async (req: NextApiRequest) => {
       user.gender = gender;
     } else {
       user = new User({
-        web3AccountAddress,
+        accountAddress,
         bio,
         phoneNumber,
         birthDate,
@@ -183,14 +183,14 @@ const updateUserBioInfo = async (req: NextApiRequest) => {
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   // first retrive user info
   if (req.method == "GET") {
-    const { web3AccountAddress } = req.query;
-    if (!web3AccountAddress) {
+    const { accountAddress } = req.query;
+    if (!accountAddress) {
       return res
         .status(400)
-        .json({ message: "web3AccountAddress is required" });
+        .json({ message: "accountAddress is required" });
     }
     try {
-      const user = await fetchUserInfo(web3AccountAddress as string);
+      const user = await fetchUserInfo(accountAddress as string);
       return res.json({ user });
     } catch (err) {
       console.log("err in fetching the user info ", err);

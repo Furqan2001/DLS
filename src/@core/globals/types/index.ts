@@ -1,3 +1,5 @@
+import { ThemeColor } from "../../layouts/types";
+
 export interface IUserInfo {
   username: string;
   name: string;
@@ -10,3 +12,9 @@ export interface IUserInfo {
 }
 
 export type TGenericObj = { [key: string]: any };
+
+export interface IGenericColor {
+  [key: string]: {
+    color: ThemeColor;
+  };
+}

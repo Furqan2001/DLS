@@ -13,6 +13,7 @@ const initialValue = {
   currentAccount: "",
   err: null,
   loading: false,
+  fetchAllUsers: async () => [],
 };
 
 const DLSContext = createContext(initialValue);
@@ -25,11 +26,17 @@ export const DLSContextProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [err, setErr] = useState(null);
 
-  const { fetchContractDetails, loginUser, loading, setLoading } =
-    useContract();
+  const {
+    fetchContractDetails,
+    fetchAllUsers,
+    loginUser,
+    loading,
+    setLoading,
+  } = useContract();
 
   const accountChangedHandler = async (newAccount) => {
     const address = await newAccount.getAddress();
+    console.log("address is ", address);
     setCurrentAccount(address);
     const balance = await newAccount.getBalance();
 
@@ -58,9 +65,10 @@ export const DLSContextProvider = ({ children }) => {
 
   useEffect(() => {
     (async () => {
-      const address = getData(LOCAL_STORAGE_KEYS.web3AccountAddress);
+      const address = getData(LOCAL_STORAGE_KEYS.accountAddress);
+
       if (!!address) {
-        await loginUser(address);
+        await fetchContractDetails();
         setCurrentAccount(address);
       }
     })();
@@ -68,7 +76,7 @@ export const DLSContextProvider = ({ children }) => {
 
   return (
     <DLSContext.Provider
-      value={{ connectToWallet, currentAccount, err, loading }}
+      value={{ connectToWallet, fetchAllUsers, currentAccount, err, loading }}
     >
       {children}
     </DLSContext.Provider>

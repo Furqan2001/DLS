@@ -9,6 +9,8 @@ import CreditCardOutline from "mdi-material-ui/CreditCardOutline";
 import AccountPlusOutline from "mdi-material-ui/AccountPlusOutline";
 import AlertCircleOutline from "mdi-material-ui/AlertCircleOutline";
 import GoogleCirclesExtended from "mdi-material-ui/GoogleCirclesExtended";
+import AddModeratorOutlinedIcon from "@mui/icons-material/AddModeratorOutlined";
+import SupervisorAccountOutlinedIcon from "@mui/icons-material/SupervisorAccountOutlined";
 
 // ** Type import
 import { VerticalNavItemsType } from "src/@core/layouts/types";
@@ -26,12 +28,18 @@ const navigation = (): VerticalNavItemsType => {
       path: "/dashboard/account-settings",
     },
     {
-      sectionTitle: "Pages",
+      sectionTitle: "Users",
     },
     {
-      title: "Error",
-      icon: AlertCircleOutline,
-      path: "/pages/error",
+      title: "Moderators",
+      icon: AddModeratorOutlinedIcon,
+      path: "/dashboard/moderators",
+      openInNewTab: true,
+    },
+    {
+      title: "Admins",
+      icon: SupervisorAccountOutlinedIcon,
+      path: "/dashboard/admins",
       openInNewTab: true,
     },
     {
@@ -40,27 +48,27 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: "Typography",
       icon: FormatLetterCase,
-      path: "/typography",
+      path: "/dashboard/typography",
     },
     {
       title: "Icons",
-      path: "/icons",
+      path: "/dashboard/icons",
       icon: GoogleCirclesExtended,
     },
     {
       title: "Cards",
       icon: CreditCardOutline,
-      path: "/cards",
+      path: "/dashboard/cards",
     },
     {
       title: "Tables",
       icon: Table,
-      path: "/tables",
+      path: "/dashboard/tables",
     },
     {
       icon: CubeOutline,
       title: "Form Layouts",
-      path: "/form-layouts",
+      path: "/dashboard/form-layouts",
     },
   ];
 };

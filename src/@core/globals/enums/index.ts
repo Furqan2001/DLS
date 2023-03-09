@@ -1,5 +1,7 @@
 export enum URLS {
   dashboard = "/dashboard",
+  moderatorDetails = "/dashboard/moderators",
+  adminDetails = "/dashboard/admins",
 }
 
 export enum ROLES {
@@ -9,5 +11,5 @@ export enum ROLES {
 }
 
 export enum LOCAL_STORAGE_KEYS {
-  web3AccountAddress = "web3AccountAddress",
+  accountAddress = "accountAddress",
 }

@@ -118,7 +118,7 @@ const TabAccount = ({ userInfo }: IProps) => {
     setLoading(true);
     setErr("");
     const formData = new FormData();
-    formData.append("web3AccountAddress", currentAccount);
+    formData.append("accountAddress", currentAccount);
     formData.append("name", formState.name);
     formData.append("email", formState.email);
     formData.append("username", formState.username);
