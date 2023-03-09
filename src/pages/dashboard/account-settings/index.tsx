@@ -24,6 +24,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import { fetchUserInfo } from "../../../common/api/userInfo";
 import { IUserInfo } from "../../../@core/globals/types";
+import useToFetchUserData from "../../../@core/hooks/useToFetchUserData";
 
 const Tab = styled(MuiTab)<TabProps>(({ theme }) => ({
   [theme.breakpoints.down("md")]: {
@@ -51,24 +52,7 @@ const AccountSettings = () => {
     setValue(newValue);
   };
 
-  const { currentAccount } = useDLSContext();
-  const [userInfo, setUserInfo] = useState<IUserInfo>();
-
-  const fetchUserDetail = useCallback(async () => {
-    if (!currentAccount) return;
-    try {
-      const userInfo = await fetchUserInfo(currentAccount);
-      if (userInfo) {
-        setUserInfo(userInfo);
-      }
-    } catch (err) {
-      console.log("err in fetching the user detail ", err);
-    }
-  }, [currentAccount]);
-
-  useEffect(() => {
-    fetchUserDetail();
-  }, [fetchUserDetail]);
+  const { userInfo } = useToFetchUserData();
 
   return (
     <Card>

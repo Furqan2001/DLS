@@ -31,15 +31,9 @@ const navigation = (): VerticalNavItemsType => {
       sectionTitle: "Users",
     },
     {
-      title: "Moderators",
+      title: "Users",
       icon: AddModeratorOutlinedIcon,
-      path: "/dashboard/moderators",
-      openInNewTab: true,
-    },
-    {
-      title: "Admins",
-      icon: SupervisorAccountOutlinedIcon,
-      path: "/dashboard/admins",
+      path: "/dashboard/users",
       openInNewTab: true,
     },
     {

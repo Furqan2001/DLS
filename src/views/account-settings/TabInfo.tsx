@@ -46,7 +46,7 @@ const TabInfo = ({ userInfo }: IProps) => {
   });
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
-  const { currentAccount } = useDLSContext();
+  const { userAddress } = useDLSContext();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormState({ ...formState, [e.target.name]: e.target.value });
@@ -60,7 +60,7 @@ const TabInfo = ({ userInfo }: IProps) => {
     setLoading(true);
 
     const formData = new FormData();
-    formData.append("accountAddress", currentAccount);
+    formData.append("accountAddress", userAddress);
     formData.append("bio", formState.bio);
     formData.append("birthDate", formState.birthDate);
     formData.append("phoneNumber", formState.phoneNumber);

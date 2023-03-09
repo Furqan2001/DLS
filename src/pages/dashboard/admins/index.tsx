@@ -1,7 +1,7 @@
 import Grid from "@mui/material/Grid";
 import { Card, CardHeader, Typography } from "@mui/material";
 import Link from "@mui/material/Link";
-import Table from "../../../views/moderatorsAndAdmin/Table";
+import Table from "../../../views/Users/Table";
 
 const Moderators = () => {
   return (

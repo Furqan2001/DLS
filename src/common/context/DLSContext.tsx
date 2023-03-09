@@ -6,14 +6,17 @@ import { DLSAddress } from "../constants/contractAddress";
 import Web3Modal from "web3modal";
 import useContract from "../hooks/useContract";
 import { getData } from "../../@core/helpers/localStorage";
-import { LOCAL_STORAGE_KEYS } from "../../@core/globals/enums";
+import { LOCAL_STORAGE_KEYS, ROLES } from "../../@core/globals/enums";
 
 const initialValue = {
   connectToWallet: () => {},
-  currentAccount: "",
+  userAddress: "",
   err: null,
   loading: false,
   fetchAllUsers: async () => [],
+  fetchSpecificUser: async (userAddress: string) => {},
+  contract: null,
+  userRole: ROLES.visitor,
 };
 
 const DLSContext = createContext(initialValue);
@@ -23,21 +26,24 @@ export const useDLSContext = () => {
 };
 
 export const DLSContextProvider = ({ children }) => {
-  const [currentAccount, setCurrentAccount] = useState("");
+  const [userAddress, setUserAddress] = useState("");
   const [err, setErr] = useState(null);
 
   const {
     fetchContractDetails,
+    fetchSpecificUser,
     fetchAllUsers,
     loginUser,
     loading,
     setLoading,
+    contract,
+    userRole,
   } = useContract();
 
   const accountChangedHandler = async (newAccount) => {
     const address = await newAccount.getAddress();
     console.log("address is ", address);
-    setCurrentAccount(address);
+    setUserAddress(address);
     const balance = await newAccount.getBalance();
 
     await loginUser(address);
@@ -68,15 +74,24 @@ export const DLSContextProvider = ({ children }) => {
       const address = getData(LOCAL_STORAGE_KEYS.accountAddress);
 
       if (!!address) {
-        await fetchContractDetails();
-        setCurrentAccount(address);
+        await loginUser(address);
+        setUserAddress(address);
       }
     })();
   }, []);
 
   return (
     <DLSContext.Provider
-      value={{ connectToWallet, fetchAllUsers, currentAccount, err, loading }}
+      value={{
+        connectToWallet,
+        fetchAllUsers,
+        fetchSpecificUser,
+        userRole,
+        userAddress,
+        err,
+        loading,
+        contract,
+      }}
     >
       {children}
     </DLSContext.Provider>

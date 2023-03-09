@@ -71,7 +71,7 @@ const TabAccount = ({ userInfo }: IProps) => {
   const [imgSrc, setImgSrc] = useState<string>("/images/avatars/1.png");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
-  const { currentAccount } = useDLSContext();
+  const { userRole, userAddress } = useDLSContext();
   const [formState, setFormState] = useState({
     username: "",
     name: "",
@@ -118,7 +118,7 @@ const TabAccount = ({ userInfo }: IProps) => {
     setLoading(true);
     setErr("");
     const formData = new FormData();
-    formData.append("accountAddress", currentAccount);
+    formData.append("accountAddress", userAddress);
     formData.append("name", formState.name);
     formData.append("email", formState.email);
     formData.append("username", formState.username);
@@ -195,7 +195,12 @@ const TabAccount = ({ userInfo }: IProps) => {
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Role</InputLabel>
-              <Select disabled label="Role" defaultValue="admin">
+              <Select
+                disabled
+                value={userRole}
+                label="Role"
+                defaultValue="admin"
+              >
                 <MenuItem value={ROLES.admin}>{ROLES.admin}</MenuItem>
                 <MenuItem value={ROLES.moderator}>{ROLES.visitor}</MenuItem>
                 <MenuItem value={ROLES.visitor}>{ROLES.visitor}</MenuItem>

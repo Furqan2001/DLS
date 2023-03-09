@@ -10,27 +10,43 @@ import {
   Typography,
 } from "@mui/material";
 import Link from "@mui/material/Link";
-import ModeratorTable from "../../../views/moderatorsAndAdmin/Table";
+import ModeratorTable from "../../../views/Users/Table";
 import { useEffect, useState } from "react";
 import { useDLSContext } from "../../../common/context/DLSContext";
+import { ROLES, SOLIDITY_ROLES_ENUM } from "../../../@core/globals/enums";
 
 const Moderators = () => {
   const [filterUsersList, setFilterUsersList] = useState("users");
-  const { fetchAllUsers } = useDLSContext();
+  const {
+    contract,
+    userAddress: currentUserAddress,
+    fetchAllUsers,
+  } = useDLSContext();
   const [allUsers, setAllUsers] = useState([]);
 
   useEffect(() => {
+    if (!contract) return;
     (async () => {
       const users = await fetchAllUsers();
-      console.log("fetchAllUsers ", users);
-      // fetch general user info from database
-      // const usersList = users.map((user) => ({
-      //   accountAddress: user.userAddress,
-      //   status: "voting", // TOOD:- update it according to role, if moderator then set status to approved otherwise voting
-      // }));
-      // setAllUsers(usersList);
+
+      const usersList = [];
+
+      users.map((user: { userAddress: string; role: SOLIDITY_ROLES_ENUM }) => {
+        if (user.userAddress !== currentUserAddress) {
+          usersList.push({
+            accountAddress: user.userAddress,
+            role:
+              user.role === SOLIDITY_ROLES_ENUM.Admin
+                ? ROLES.admin
+                : user.role === SOLIDITY_ROLES_ENUM.Moderator
+                ? ROLES.moderator
+                : ROLES.visitor,
+          });
+        }
+      });
+      setAllUsers(usersList);
     })();
-  }, [fetchAllUsers]);
+  }, [contract]);
 
   return (
     <Grid container spacing={6}>

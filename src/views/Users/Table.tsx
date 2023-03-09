@@ -13,14 +13,12 @@ import TablePagination from "@mui/material/TablePagination";
 import { IGenericColor } from "../../@core/globals/types";
 import { Chip } from "@mui/material";
 import Link from "next/link";
-import { URLS } from "../../@core/globals/enums";
+import { ROLES, URLS } from "../../@core/globals/enums";
 import LoadingButton from "../../@core/components/shared/LoadingButton";
 import { useRouter } from "next/router";
 
-type accountStatus = "requested" | "approved" | "voting" | "rejected";
-
 interface Column {
-  id: "name" | "email" | "accountAddress" | "status" | "actions";
+  id: "name" | "email" | "accountAddress" | "role" | "actions";
   label: string;
   minWidth?: number;
   align?: "right";
@@ -29,29 +27,28 @@ interface Column {
 
 const columns: readonly Column[] = [
   { id: "accountAddress", label: "Account Address", minWidth: 170 },
-  { id: "status", label: "Status", minWidth: 100 },
+  { id: "role", label: "Role", minWidth: 100 },
   { id: "actions", label: "Actions", minWidth: 100 },
 ];
 
 interface Data {
   accountAddress: string;
-  status: accountStatus;
+  role: ROLES;
 }
 
-function createData(accountAddress: string, status: accountStatus): Data {
-  return { accountAddress, status };
+function createData(accountAddress: string, role: ROLES): Data {
+  return { accountAddress, role };
 }
 
-const statusObj: IGenericColor = {
-  voting: { color: "info" },
-  rejected: { color: "error" },
-  approved: { color: "primary" },
-  requested: { color: "success" },
+const roleColorObj: IGenericColor = {
+  [ROLES.admin]: { color: "primary" },
+  [ROLES.moderator]: { color: "info" },
+  [ROLES.visitor]: { color: "success" },
 };
 
 interface IProps {
   tableRole?: "admin" | "moderator";
-  data?: { accountAddress: string; status: accountStatus }[];
+  data?: { accountAddress: string; role: ROLES }[];
 }
 
 const Table = ({ tableRole, data = [] }: IProps) => {
@@ -73,7 +70,7 @@ const Table = ({ tableRole, data = [] }: IProps) => {
     if (tableRole === "admin") {
       return router.push(`${URLS.adminDetails}/${accountAddress}`);
     }
-    router.push(`${URLS.moderatorDetails}/${accountAddress}`);
+    router.push(`${URLS.usersDetail}/${accountAddress}`);
   };
 
   return (
@@ -107,12 +104,12 @@ const Table = ({ tableRole, data = [] }: IProps) => {
                     {columns.map((column) => {
                       const value = row[column.id];
 
-                      if (column.id === "status") {
+                      if (column.id === "role") {
                         return (
                           <TableCell key={column.id}>
                             <Chip
-                              label={row.status}
-                              color={statusObj[value]?.color}
+                              label={row.role}
+                              color={roleColorObj[value]?.color}
                               sx={{
                                 height: 24,
                                 fontSize: "0.75rem",
