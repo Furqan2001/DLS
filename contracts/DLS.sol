@@ -157,13 +157,20 @@ contract DLS {
 
     // get the logged in user
     function getUser() public view returns (UserReturnItem memory) {
-        return fetchSingleUser(msg.sender);
+        return fetchUser(msg.sender);
     }
 
-    // fetch a specific user
+    // fetch a single user
     function fetchSingleUser(
         address userAddress
     ) public view verifiedAdmin returns (UserReturnItem memory) {
+        return fetchUser(userAddress);
+    }
+
+    // fetch a specific user private func
+    function fetchUser(
+        address userAddress
+    ) private view returns (UserReturnItem memory) {
         uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
 
         UserReturnItem memory userItem;
