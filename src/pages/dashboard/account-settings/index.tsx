@@ -23,8 +23,8 @@ import TabAccount from "src/views/account-settings/TabAccount";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import { fetchUserInfo } from "../../../common/api/userInfo";
-import { IUserInfo } from "../../../@core/globals/types";
-import useToFetchUserData from "../../../@core/hooks/useToFetchUserData";
+import { IDbUserInfo } from "../../../@core/globals/types";
+import { useUserInfo } from "../../../common/context/UserInfoContext";
 
 const Tab = styled(MuiTab)<TabProps>(({ theme }) => ({
   [theme.breakpoints.down("md")]: {
@@ -52,7 +52,7 @@ const AccountSettings = () => {
     setValue(newValue);
   };
 
-  const { userInfo } = useToFetchUserData();
+  const { userInfo } = useUserInfo();
 
   return (
     <Card>

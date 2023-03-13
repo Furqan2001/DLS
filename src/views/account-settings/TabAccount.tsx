@@ -32,7 +32,7 @@ import { fetchUserInfo, updateUserInfo } from "../../common/api/userInfo";
 import { useDLSContext } from "../../common/context/DLSContext";
 import { findUndefinedKeyInObj } from "../../@core/helpers";
 import LoadingButton from "../../@core/components/shared/LoadingButton";
-import { IUserInfo } from "../../@core/globals/types";
+import { IDbUserInfo } from "../../@core/globals/types";
 
 const ImgStyled = styled("img")(({ theme }) => ({
   width: 120,
@@ -61,7 +61,7 @@ const ResetButtonStyled = styled(Button)<ButtonProps>(({ theme }) => ({
 }));
 
 interface IProps {
-  userInfo?: IUserInfo;
+  userInfo?: IDbUserInfo;
 }
 
 const TabAccount = ({ userInfo }: IProps) => {
@@ -72,11 +72,12 @@ const TabAccount = ({ userInfo }: IProps) => {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const { userRole, userAddress } = useDLSContext();
+
   const [formState, setFormState] = useState({
     username: "",
     name: "",
     email: "",
-    role: ROLES.admin,
+    role: ROLES.visitor,
   });
 
   const onChangeFile = (file: ChangeEvent) => {
@@ -199,7 +200,7 @@ const TabAccount = ({ userInfo }: IProps) => {
                 disabled
                 value={userRole}
                 label="Role"
-                defaultValue="admin"
+                defaultValue="visitor"
               >
                 <MenuItem value={ROLES.admin}>{ROLES.admin}</MenuItem>
                 <MenuItem value={ROLES.moderator}>{ROLES.visitor}</MenuItem>

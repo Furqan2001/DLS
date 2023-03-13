@@ -5,6 +5,7 @@ import {
   useState,
   SyntheticEvent,
   useEffect,
+  useCallback,
 } from "react";
 
 // ** MUI Imports
@@ -37,99 +38,118 @@ import {
 } from "@mui/material";
 import useToFetchUserData from "../../../@core/hooks/useToFetchUserData";
 import { useDLSContext } from "../../../common/context/DLSContext";
-
-interface State {
-  password: string;
-  showPassword: boolean;
-}
+import { IBlockchainUserInfo, IDbUserInfo } from "../../../@core/globals/types";
+import { ROLES } from "../../../@core/globals/enums";
+import LoadingButton from "../../../@core/components/shared/LoadingButton";
+import { useUserInfo } from "../../../common/context/UserInfoContext";
 
 const FormLayoutsBasic = () => {
   // ** States
-  const [values, setValues] = useState<State>({
-    password: "",
-    showPassword: false,
-  });
-  const [confirmPassValues, setConfirmPassValues] = useState<State>({
-    password: "",
-    showPassword: false,
-  });
+
+  const [blockchainUserInfo, setBlockchainUserInfo] =
+    useState<IBlockchainUserInfo>();
 
   const router = useRouter();
 
   const { accountAddress } = router.query;
 
-  const { fetchSpecificUser, contract, userAddress } = useDLSContext();
+  const { fetchSpecificUser, addNewModerator, addNewAdmin } = useDLSContext();
+  const [dbUserInfo, setDbUserInfo] = useState<IDbUserInfo>();
 
-  const { userInfo } = useToFetchUserData({
-    defaultUserAddress: accountAddress as string,
-  });
+  const { fetchUserDbDetails, loadingUserInfo } = useUserInfo();
 
-  const handleChange =
-    (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
-      setValues({ ...values, [prop]: event.target.value });
-    };
+  const fetchUserBlockchainInfo = useCallback(async () => {
+    if (!accountAddress) return;
 
-  const handleConfirmPassChange =
-    (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
-      setConfirmPassValues({
-        ...confirmPassValues,
-        [prop]: event.target.value,
-      });
-    };
-  const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword });
-  };
+    // load dbUserInfo from db
+    try {
+      const dbUserInfo = await fetchUserDbDetails(accountAddress as string);
+      setDbUserInfo(dbUserInfo);
 
-  const handleClickConfirmPassShow = () => {
-    setConfirmPassValues({
-      ...confirmPassValues,
-      showPassword: !confirmPassValues.showPassword,
-    });
-  };
-
-  const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
+      const res = await fetchSpecificUser(accountAddress as string);
+      if (res && Object.keys(res).length > 0)
+        setBlockchainUserInfo(res as IBlockchainUserInfo);
+    } catch (err) {
+      console.log("err in fetching the user details ", err);
+    }
+  }, [accountAddress]);
 
   useEffect(() => {
-    if (!userAddress) return;
+    fetchUserBlockchainInfo();
+  }, [fetchUserBlockchainInfo]);
 
-    fetchSpecificUser(userAddress).then((res) => {
-      console.log("fetched specific user data ", res);
-    });
-  }, [userAddress]);
+  const onClickBtn = async () => {
+    const account = accountAddress as string;
+    if (blockchainUserInfo.role === ROLES.visitor) {
+      // visitor can only convert to Moderxator
+      await addNewModerator(account);
+      await fetchUserBlockchainInfo();
+    } else {
+      // moderator can become to admin
+      await addNewAdmin(account);
+      await fetchUserBlockchainInfo();
+    }
+  };
 
   return (
     <Card>
       <CardHeader title="Admin Info" titleTypographyProps={{ variant: "h6" }} />
       <CardContent>
-        {!userInfo && (
+        {!dbUserInfo && (
           <Box>
-            <Alert severity="error">Detailed user info is not present.</Alert>
+            <Alert severity={loadingUserInfo ? "info" : "error"}>
+              {loadingUserInfo
+                ? "Please wait..."
+                : "Detailed user info is not present."}
+            </Alert>
           </Box>
         )}
-        {!!userInfo && (
+        {!!dbUserInfo && (
           <form onSubmit={(e) => e.preventDefault()}>
             <Grid container spacing={5}>
               <Grid item container xs={12} spacing={5}>
                 <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="Username" name="username" />
+                  <TextField
+                    fullWidth
+                    label="Username"
+                    value={dbUserInfo.username}
+                    name="username"
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="Name" name="name" />
+                  <TextField
+                    fullWidth
+                    label="Name"
+                    value={dbUserInfo.name}
+                    name="name"
+                  />
                 </Grid>
               </Grid>
               <Grid item container xs={12} spacing={5}>
                 <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="Email" name="email" />
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    value={dbUserInfo.email}
+                    name="email"
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="Phone" name="phone" />
+                  <TextField
+                    fullWidth
+                    value={dbUserInfo.phoneNumber}
+                    name="phone"
+                  />
                 </Grid>
               </Grid>
               <Grid item container xs={12} spacing={5}>
                 <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="Cnic" name="cnic" />
+                  <TextField
+                    fullWidth
+                    label="Cnic"
+                    value={dbUserInfo.cnic}
+                    name="cnic"
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl>
@@ -139,6 +159,7 @@ const FormLayoutsBasic = () => {
                       defaultValue="male"
                       aria-label="gender"
                       name="gender"
+                      value={dbUserInfo.gender}
                     >
                       <FormControlLabel
                         value="male"
@@ -160,36 +181,43 @@ const FormLayoutsBasic = () => {
                 </Grid>
               </Grid>
 
-              <Grid item xs={12}>
-                <Box
-                  sx={{
-                    gap: 5,
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                  }}
-                >
-                  <Button type="submit" variant="contained" size="large">
-                    Approve It
-                  </Button>
-
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="error"
-                    size="large"
-                  >
-                    Reject It
-                  </Button>
-                </Box>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Alert severity="success">5 admins already approved</Alert>
-                <Alert severity="error" sx={{ mt: 3 }}>
-                  3 admins already rejected
-                </Alert>
-              </Grid>
+              {blockchainUserInfo &&
+                blockchainUserInfo?.role !== ROLES.admin && (
+                  <>
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          gap: 5,
+                          display: "flex",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                        }}
+                      >
+                        <LoadingButton
+                          type="submit"
+                          variant="contained"
+                          size="large"
+                          onClick={onClickBtn}
+                        >
+                          {blockchainUserInfo.role === ROLES.visitor
+                            ? "Vote to make a moderator"
+                            : "Vote to make an Admin"}
+                        </LoadingButton>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Alert severity="success">
+                        {blockchainUserInfo.role === ROLES.visitor
+                          ? blockchainUserInfo.modApprovalsLeft
+                          : blockchainUserInfo.adminApprovalsLeft}{" "}
+                        approvals requires to become
+                        {blockchainUserInfo.role === ROLES.visitor
+                          ? "moderator"
+                          : "admin"}
+                      </Alert>
+                    </Grid>
+                  </>
+                )}
             </Grid>
           </form>
         )}

@@ -15,8 +15,9 @@ import { useEffect, useState } from "react";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import { ROLES, SOLIDITY_ROLES_ENUM } from "../../../@core/globals/enums";
 
+type TFilterUsers = "users" | ROLES.moderator | ROLES.admin;
 const Moderators = () => {
-  const [filterUsersList, setFilterUsersList] = useState("users");
+  const [filterUsersList, setFilterUsersList] = useState<TFilterUsers>("users");
   const {
     contract,
     userAddress: currentUserAddress,
@@ -27,7 +28,7 @@ const Moderators = () => {
   useEffect(() => {
     if (!contract) return;
     (async () => {
-      const users = await fetchAllUsers();
+      const users = await fetchAllUsers(filterUsersList);
 
       const usersList = [];
 
@@ -46,7 +47,7 @@ const Moderators = () => {
       });
       setAllUsers(usersList);
     })();
-  }, [contract]);
+  }, [contract, filterUsersList]);
 
   return (
     <Grid container spacing={6}>
@@ -78,10 +79,13 @@ const Moderators = () => {
                       id="form-layouts-separator-select"
                       labelId="form-layouts-separator-select-label"
                       value={filterUsersList}
-                      onChange={(e) => setFilterUsersList(e.target.value)}
+                      onChange={(e) =>
+                        setFilterUsersList(e.target.value as TFilterUsers)
+                      }
                     >
                       <MenuItem value="users">All Users</MenuItem>
-                      <MenuItem value="moderators">Moderators</MenuItem>
+                      <MenuItem value="moderator">Moderators</MenuItem>
+                      <MenuItem value="admin">Admins</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>

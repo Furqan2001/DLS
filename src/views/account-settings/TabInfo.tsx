@@ -25,7 +25,7 @@ import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
 import { findUndefinedKeyInObj } from "../../@core/helpers";
 import { useDLSContext } from "../../common/context/DLSContext";
 import { fetchUserInfo, updateUserBioInfo } from "../../common/api/userInfo";
-import { IUserInfo } from "../../@core/globals/types";
+import { IDbUserInfo } from "../../@core/globals/types";
 import LoadingButton from "../../@core/components/shared/LoadingButton";
 
 // eslint-disable-next-line react/display-name
@@ -34,7 +34,7 @@ const CustomInput = forwardRef((props, ref) => {
 });
 
 interface IProps {
-  userInfo?: IUserInfo;
+  userInfo?: IDbUserInfo;
 }
 
 const TabInfo = ({ userInfo }: IProps) => {
@@ -103,7 +103,11 @@ const TabInfo = ({ userInfo }: IProps) => {
           <Grid item xs={12} sm={6}>
             <DatePickerWrapper>
               <DatePicker
-                selected={new Date(formState.birthDate)}
+                selected={
+                  formState.birthDate
+                    ? new Date(formState.birthDate)
+                    : new Date()
+                }
                 showYearDropdown
                 showMonthDropdown
                 id="account-settings-date"

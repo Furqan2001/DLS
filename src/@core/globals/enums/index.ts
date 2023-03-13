@@ -1,7 +1,8 @@
 export enum URLS {
   dashboard = "/dashboard",
   usersDetail = "/dashboard/users",
-  adminDetails = "/dashboard/admins",
+  profile = "/dashboard/account-settings",
+  login = "/",
 }
 
 export enum SOLIDITY_ROLES_ENUM {

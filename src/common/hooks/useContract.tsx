@@ -11,6 +11,7 @@ import {
   URLS,
 } from "../../@core/globals/enums";
 import { saveData } from "../../@core/helpers/localStorage";
+import { IBlockchainUserInfo } from "../../@core/globals/types";
 
 const abi = DLSJSON.abi;
 
@@ -23,6 +24,7 @@ const useContract = () => {
   const [userRole, setUserRole] = useState<ROLES>();
 
   const router = useRouter();
+
   const fetchContractDetails = async () => {
     try {
       const web3Modal = new Web3Modal();
@@ -39,7 +41,10 @@ const useContract = () => {
     return contract;
   };
 
-  const loginUser = async (currentAccountAddress: string) => {
+  const loginUser = async (
+    currentAccountAddress: string,
+    skipRouting = false
+  ) => {
     const contract = await fetchContractDetails();
     if (!contract) {
       setLoading(false);
@@ -59,25 +64,40 @@ const useContract = () => {
       }
     }
 
-    assignUserRole(user);
-    saveData(LOCAL_STORAGE_KEYS.accountAddress, currentAccountAddress);
-    router.push(URLS.dashboard);
-  };
+    const role = getUserRole(user);
 
-  const assignUserRole = (user: { role: SOLIDITY_ROLES_ENUM }) => {
-    if (user.role === SOLIDITY_ROLES_ENUM.Moderator) {
-      setUserRole(ROLES.moderator);
-    } else if (user.role === SOLIDITY_ROLES_ENUM.Admin) {
-      setUserRole(ROLES.admin);
-    } else {
-      setUserRole(ROLES.visitor);
+    setUserRole(role);
+
+    if (!skipRouting) {
+      saveData(LOCAL_STORAGE_KEYS.accountAddress, currentAccountAddress);
+      router.push(URLS.dashboard);
     }
   };
 
-  const fetchAllUsers = async () => {
+  const getUserRole = (user: { role: SOLIDITY_ROLES_ENUM }) => {
+    if (user.role === SOLIDITY_ROLES_ENUM.Moderator) {
+      return ROLES.moderator;
+    } else if (user.role === SOLIDITY_ROLES_ENUM.Admin) {
+      return ROLES.admin;
+    } else {
+      return ROLES.visitor;
+    }
+  };
+
+  const fetchAllUsers = async (
+    type: ROLES.admin | ROLES.moderator | "users" = "users"
+  ) => {
     let users = [];
+
+    console.log("type is ", type);
     try {
-      users = await contract.fetchAllUsers();
+      if (type === "users") {
+        users = await contract.fetchAllUsers();
+      } else if (type === ROLES.admin) {
+        users = await contract.fetchAllAdmins();
+      } else if (type === ROLES.moderator) {
+        users = await contract.fetchAllModerators();
+      }
     } catch (err) {
       console.log("err in fetching all the users ", contract, err);
     }
@@ -89,10 +109,44 @@ const useContract = () => {
       if (!contract) return;
       try {
         const user = await contract.fetchSingleUser(userAddress);
-        console.log("user is ", user);
+
+        return {
+          userAddress: user.userAddress,
+          adminApprovalsLeft: Number(user.adminApprovalsLeft),
+          modApprovalsLeft: Number(user.modApprovalsLeft),
+          role: getUserRole(user),
+        };
       } catch (err) {
         console.log("err in fetching the user ", contract, err);
       }
+    },
+    [contract]
+  );
+
+  const addNewModerator = useCallback(
+    async (userAddress: string) => {
+      if (!contract) return;
+      setLoading(true);
+      try {
+        await contract.addNewModerator(userAddress);
+      } catch (err) {
+        console.log("err in making the moderator ", contract, err);
+      }
+      setLoading(false);
+    },
+    [contract]
+  );
+
+  const addNewAdmin = useCallback(
+    async (userAddress: string) => {
+      if (!contract) return;
+      setLoading(true);
+      try {
+        await contract.addNewAdmin(userAddress);
+      } catch (err) {
+        console.log("err in making the moderator ", contract, err);
+      }
+      setLoading(false);
     },
     [contract]
   );
@@ -106,6 +160,8 @@ const useContract = () => {
     userRole,
     setLoading,
     fetchSpecificUser,
+    addNewModerator,
+    addNewAdmin,
   };
 };
 

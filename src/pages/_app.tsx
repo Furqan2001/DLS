@@ -34,6 +34,7 @@ import "react-perfect-scrollbar/dist/css/styles.css";
 import "../../styles/globals.css";
 import { useEffect, useState } from "react";
 import { DLSContextProvider } from "../common/context/DLSContext";
+import UserInfoContextProvider from "../common/context/UserInfoContext";
 
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
@@ -91,17 +92,19 @@ const App = (props: ExtendedAppProps) => {
       </Head>
 
       <DLSContextProvider>
-        <SettingsProvider>
-          <SettingsConsumer>
-            {({ settings }) => {
-              return (
-                <ThemeComponent settings={settings}>
-                  {getLayout(<Component {...pageProps} />)}
-                </ThemeComponent>
-              );
-            }}
-          </SettingsConsumer>
-        </SettingsProvider>
+        <UserInfoContextProvider>
+          <SettingsProvider>
+            <SettingsConsumer>
+              {({ settings }) => {
+                return (
+                  <ThemeComponent settings={settings}>
+                    {getLayout(<Component {...pageProps} />)}
+                  </ThemeComponent>
+                );
+              }}
+            </SettingsConsumer>
+          </SettingsProvider>
+        </UserInfoContextProvider>
       </DLSContextProvider>
     </CacheProvider>
   );
