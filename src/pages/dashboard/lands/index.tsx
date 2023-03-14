@@ -10,54 +10,25 @@ import {
   Typography,
 } from "@mui/material";
 import Link from "@mui/material/Link";
-import UsersTable from "../../../views/Users/Table";
+import ModeratorTable from "../../../views/Users/Table";
 import { useEffect, useState } from "react";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import { ROLES, SOLIDITY_ROLES_ENUM } from "../../../@core/globals/enums";
 
-type TFilterUsers = "users" | ROLES.moderator | ROLES.admin;
-const Users = () => {
-  const [filterUsersList, setFilterUsersList] = useState<TFilterUsers>("users");
-  const {
-    contract,
-    userAddress: currentUserAddress,
-    fetchAllUsers,
-  } = useDLSContext();
+const Moderators = () => {
+  const [filterUsersList, setFilterUsersList] = useState("all");
+  const {} = useDLSContext();
   const [allUsers, setAllUsers] = useState([]);
-
-  useEffect(() => {
-    if (!contract) return;
-    (async () => {
-      const users = await fetchAllUsers(filterUsersList);
-
-      const usersList = [];
-
-      users.map((user: { userAddress: string; role: SOLIDITY_ROLES_ENUM }) => {
-        if (user.userAddress !== currentUserAddress) {
-          usersList.push({
-            accountAddress: user.userAddress,
-            role:
-              user.role === SOLIDITY_ROLES_ENUM.Admin
-                ? ROLES.admin
-                : user.role === SOLIDITY_ROLES_ENUM.Moderator
-                ? ROLES.moderator
-                : ROLES.visitor,
-          });
-        }
-      });
-      setAllUsers(usersList);
-    })();
-  }, [contract, filterUsersList]);
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Typography variant="h5">
           <Link href="https://mui.com/components/tables/" target="_blank">
-            Users
+            Lands
           </Link>
         </Typography>
-        <Typography variant="body2">List of all users</Typography>
+        <Typography variant="body2">List of all land records</Typography>
       </Grid>
 
       <Grid item xs={12}>
@@ -71,7 +42,7 @@ const Users = () => {
                 <Grid item xs={4}>
                   <FormControl fullWidth>
                     <InputLabel id="form-layouts-separator-select-label">
-                      Users
+                      Land Filters
                     </InputLabel>
                     <Select
                       label="Country"
@@ -79,13 +50,12 @@ const Users = () => {
                       id="form-layouts-separator-select"
                       labelId="form-layouts-separator-select-label"
                       value={filterUsersList}
-                      onChange={(e) =>
-                        setFilterUsersList(e.target.value as TFilterUsers)
-                      }
+                      onChange={(e) => setFilterUsersList(e.target.value)}
                     >
-                      <MenuItem value="users">All Users</MenuItem>
-                      <MenuItem value="moderator">Moderators</MenuItem>
-                      <MenuItem value="admin">Admins</MenuItem>
+                      <MenuItem value="all">All</MenuItem>
+                      <MenuItem value="approved">Approved</MenuItem>
+                      <MenuItem value="rejected">Rejected</MenuItem>
+                      <MenuItem value="pending">Pending</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -93,11 +63,11 @@ const Users = () => {
             }
             titleTypographyProps={{ variant: "h6" }}
           />
-          <UsersTable data={allUsers} />
+          <ModeratorTable data={allUsers} />
         </Card>
       </Grid>
     </Grid>
   );
 };
 
-export default Users;
+export default Moderators;
