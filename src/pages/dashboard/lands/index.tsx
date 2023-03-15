@@ -13,7 +13,6 @@ import Link from "@mui/material/Link";
 import ModeratorTable from "../../../views/Users/Table";
 import { useEffect, useState } from "react";
 import { useDLSContext } from "../../../common/context/DLSContext";
-import { ROLES, SOLIDITY_ROLES_ENUM } from "../../../@core/globals/enums";
 
 const Moderators = () => {
   const [filterUsersList, setFilterUsersList] = useState("all");

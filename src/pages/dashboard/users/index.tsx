@@ -13,7 +13,8 @@ import Link from "@mui/material/Link";
 import UsersTable from "../../../views/Users/Table";
 import { useEffect, useState } from "react";
 import { useDLSContext } from "../../../common/context/DLSContext";
-import { ROLES, SOLIDITY_ROLES_ENUM } from "../../../@core/globals/enums";
+import { ROLES } from "../../../@core/globals/enums";
+import { getRoles } from "../../../@core/helpers";
 
 type TFilterUsers = "users" | ROLES.moderator | ROLES.admin;
 const Users = () => {
@@ -32,16 +33,11 @@ const Users = () => {
 
       const usersList = [];
 
-      users.map((user: { userAddress: string; role: SOLIDITY_ROLES_ENUM }) => {
+      users.map((user: { userAddress: string; role: any }) => {
         if (user.userAddress !== currentUserAddress) {
           usersList.push({
             accountAddress: user.userAddress,
-            role:
-              user.role === SOLIDITY_ROLES_ENUM.Admin
-                ? ROLES.admin
-                : user.role === SOLIDITY_ROLES_ENUM.Moderator
-                ? ROLES.moderator
-                : ROLES.visitor,
+            role: getRoles(user.role),
           });
         }
       });

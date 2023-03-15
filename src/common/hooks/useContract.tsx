@@ -4,14 +4,10 @@ import { DLSAddress } from "../constants/contractAddress";
 import Web3Modal from "web3modal";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/router";
-import {
-  LOCAL_STORAGE_KEYS,
-  ROLES,
-  SOLIDITY_ROLES_ENUM,
-  URLS,
-} from "../../@core/globals/enums";
+import { LOCAL_STORAGE_KEYS, ROLES, URLS } from "../../@core/globals/enums";
 import { saveData } from "../../@core/helpers/localStorage";
 import { IBlockchainUserInfo } from "../../@core/globals/types";
+import { getRoles } from "../../@core/helpers";
 
 const abi = DLSJSON.abi;
 
@@ -64,7 +60,7 @@ const useContract = () => {
       }
     }
 
-    const role = getUserRole(user);
+    const role = getRoles(user.role);
 
     setUserRole(role);
 
@@ -74,15 +70,7 @@ const useContract = () => {
     }
   };
 
-  const getUserRole = (user: { role: SOLIDITY_ROLES_ENUM }) => {
-    if (user.role === SOLIDITY_ROLES_ENUM.Moderator) {
-      return ROLES.moderator;
-    } else if (user.role === SOLIDITY_ROLES_ENUM.Admin) {
-      return ROLES.admin;
-    } else {
-      return ROLES.visitor;
-    }
-  };
+ 
 
   const fetchAllUsers = async (
     type: ROLES.admin | ROLES.moderator | "users" = "users"
@@ -114,7 +102,7 @@ const useContract = () => {
           userAddress: user.userAddress,
           adminApprovalsLeft: Number(user.adminApprovalsLeft),
           modApprovalsLeft: Number(user.modApprovalsLeft),
-          role: getUserRole(user),
+          role: getRoles(user.role),
         };
       } catch (err) {
         console.log("err in fetching the user ", contract, err);

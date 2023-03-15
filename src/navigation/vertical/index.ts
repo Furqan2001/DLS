@@ -11,6 +11,8 @@ import AlertCircleOutline from "mdi-material-ui/AlertCircleOutline";
 import GoogleCirclesExtended from "mdi-material-ui/GoogleCirclesExtended";
 import AddModeratorOutlinedIcon from "@mui/icons-material/AddModeratorOutlined";
 import SupervisorAccountOutlinedIcon from "@mui/icons-material/SupervisorAccountOutlined";
+import LocationCityIcon from "@mui/icons-material/LocationCity";
+import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
 
 // ** Type import
 import { VerticalNavItemsType } from "src/@core/layouts/types";
@@ -37,33 +39,33 @@ const navigation = (): VerticalNavItemsType => {
       openInNewTab: true,
     },
     {
-      sectionTitle: "User Interface",
+      sectionTitle: "Lands",
     },
     {
-      title: "Typography",
-      icon: FormatLetterCase,
-      path: "/dashboard/typography",
+      title: "Lands",
+      icon: LocationCityIcon,
+      path: "/dashboard/lands",
     },
     {
-      title: "Icons",
-      path: "/dashboard/icons",
-      icon: GoogleCirclesExtended,
+      title: "Add Land",
+      icon: AddLocationAltIcon,
+      path: "/dashboard/new-land",
     },
-    {
-      title: "Cards",
-      icon: CreditCardOutline,
-      path: "/dashboard/cards",
-    },
-    {
-      title: "Tables",
-      icon: Table,
-      path: "/dashboard/tables",
-    },
-    {
-      icon: CubeOutline,
-      title: "Form Layouts",
-      path: "/dashboard/form-layouts",
-    },
+    // {
+    //   title: "Cards",
+    //   icon: CreditCardOutline,
+    //   path: "/dashboard/cards",
+    // },
+    // {
+    //   title: "Tables",
+    //   icon: Table,
+    //   path: "/dashboard/tables",
+    // },
+    // {
+    //   icon: CubeOutline,
+    //   title: "Form Layouts",
+    //   path: "/dashboard/form-layouts",
+    // },
   ];
 };
 

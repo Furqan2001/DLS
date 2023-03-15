@@ -5,11 +5,11 @@ export enum URLS {
   login = "/",
 }
 
-export enum SOLIDITY_ROLES_ENUM {
-  Visitor = 0,
-  Moderator = 1,
-  Admin = 2,
-}
+// export enum getRole {
+//   Visitor = 0,
+//   Moderator = 1,
+//   Admin = 2,
+// }
 
 export enum ROLES {
   visitor = "visitor",
