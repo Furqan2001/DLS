@@ -6,6 +6,7 @@ import React, {
   MouseEvent,
   useState,
 } from "react";
+import { DOMAIN_URL, client } from '../../../@core/helpers/ipfs';
 
 // ** MUI Imports
 import Card from "@mui/material/Card";
@@ -66,7 +67,7 @@ const CustomInput = forwardRef((props, ref) => (
     fullWidth
     {...props}
     inputRef={ref}
-    label="Land Purchased Date"
+    label="Land Purchase Date"
     autoComplete="off"
   />
 ));
@@ -75,7 +76,9 @@ const NewLand = () => {
   // ** States
   const [language, setLanguage] = useState<string[]>([]);
   const [date, setDate] = useState<Date | null | undefined>(null);
-  const [uploadedFiles, setUploadFiles] = useState<FileList>();
+  const [uploadingImageStatus, setuploadingImageStatus] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState(false);
+  const [fileUrl, setFileUrl] = useState("");
   const [formState, setFormState] = useState({
     owner_full_name: "",
     owner_father_name: "",
@@ -87,29 +90,54 @@ const NewLand = () => {
     land_total_area: "",
     land_amount: "",
     land_city: "",
-    land_location: "",
+    land_district: "",
     land_complete_location: "",
-    land_complete_land_area: "",
-    land_purchased_date: new Date(),
+    // land_complete_land_area: "",
+    land_purchase_date: new Date(),
     prev_owner_cnic: "",
   });
 
-  const onChangeFile = (file: ChangeEvent) => {
-    const reader = new FileReader();
-    const { files } = file.target as HTMLInputElement;
-    setUploadFiles(files);
-    if (files && files.length !== 0) {
-      //reader.onload = () => setImgSrc(reader.result as string);
-      reader.readAsDataURL(files[0]);
+  async function onChangeFile(e: ChangeEvent) {
+    const file = (e.target as HTMLInputElement).files[0];
+
+    if (!file) return alert("No files selected");
+
+    try {
+      setuploadingImageStatus(true);
+      const result = await client.add(file);
+      const url = DOMAIN_URL + result.path;
+      setuploadingImageStatus(false);
+      setFileUrl(url);
+    } catch (e) {
+      setuploadingImageStatus(false);
+      console.log(e);
     }
-  };
+  }
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormState({ ...formState, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    console.log("formState is ", formState);
+  const handleSubmit = async () => {
+    for (let key in formState) {
+      if (key !== "prev_owner_cnic" && formState[key] === "") return;
+    }
+    if (fileUrl === "") return;
+    const data = JSON.stringify({ ...formState, certificate: fileUrl });
+    setSubmissionStatus(true);
+    try {
+      const added = await client.add(data);
+
+      //use added.path as ipfsHash
+
+      //For console testing
+      const url = DOMAIN_URL + added.path;
+      console.log(url);
+
+      setSubmissionStatus(false);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -132,6 +160,7 @@ const NewLand = () => {
                 fullWidth
                 label="full name"
                 name="owner_full_name"
+                required
                 value={formState.owner_full_name}
                 onChange={onChange}
               />
@@ -141,6 +170,7 @@ const NewLand = () => {
                 fullWidth
                 label="Father name"
                 name="owner_father_name"
+                required
                 value={formState.owner_father_name}
                 onChange={onChange}
               />
@@ -150,6 +180,7 @@ const NewLand = () => {
                 fullWidth
                 label="Mother Name"
                 name="owner_mother_name"
+                required
                 value={formState.owner_mother_name}
                 onChange={onChange}
               />
@@ -161,6 +192,7 @@ const NewLand = () => {
                 label="email"
                 type="email"
                 name="owner_email"
+                required
                 value={formState.owner_email}
                 onChange={onChange}
               />
@@ -170,6 +202,7 @@ const NewLand = () => {
                 fullWidth
                 label="Phone Number"
                 name="owner_phone"
+                required
                 value={formState.owner_phone}
                 onChange={onChange}
               />
@@ -180,6 +213,7 @@ const NewLand = () => {
                 label="CNIC Number"
                 placeholder="sample ( 31304-4537123-3 )"
                 name="owner_cnic"
+                required
                 value={formState.owner_cnic}
                 onChange={onChange}
               />
@@ -191,6 +225,7 @@ const NewLand = () => {
                 fullWidth
                 placeholder="Complete Address"
                 name="owner_complete_address"
+                required
                 value={formState.owner_complete_address}
                 onChange={onChange}
               />
@@ -210,6 +245,7 @@ const NewLand = () => {
                 label="Total Land Area"
                 placeholder="land area in sq ft"
                 name="land_total_area"
+                required
                 value={formState.land_total_area}
                 onChange={onChange}
               />
@@ -217,9 +253,10 @@ const NewLand = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Amount"
-                placeholder="amount"
+                label="Amount Paid"
+                placeholder="amount paid"
                 name="land_amount"
+                required
                 value={formState.land_amount}
                 onChange={onChange}
               />
@@ -231,6 +268,7 @@ const NewLand = () => {
                 label="City"
                 placeholder="city"
                 name="land_city"
+                required
                 value={formState.land_city}
                 onChange={onChange}
               />
@@ -238,10 +276,11 @@ const NewLand = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Location"
-                placeholder="location"
-                name="land_location"
-                value={formState.land_location}
+                label="District"
+                placeholder="District"
+                name="land_district"
+                required
+                value={formState.land_district}
                 onChange={onChange}
               />
             </Grid>
@@ -255,59 +294,58 @@ const NewLand = () => {
                 helperText="Complete location date like sector h12, street 2, plot number and so on"
                 name="land_complete_location"
                 value={formState.land_complete_location}
+                required
                 onChange={onChange}
               />
             </Grid>
 
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <TextField
                 multiline
                 fullWidth
                 minRows={2}
-                label="Complete land area deail"
+                label="Complete land area detail"
                 placeholder="Complete detail about the front, back and side area in sq.ft"
                 helperText="Complete detail about the front, back and side area in sq.ft"
                 name="land_complete_land_area"
                 value={formState.land_complete_land_area}
                 onChange={onChange}
               />
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} sm={6}>
               <DatePickerWrapper>
                 <DatePicker
-                  selected={formState.land_purchased_date || new Date()}
+                  selected={formState.land_purchase_date || new Date()}
                   showYearDropdown
                   showMonthDropdown
                   id="account-settings-date"
                   placeholderText="MM-DD-YYYY"
                   customInput={<CustomInput />}
-                  value={formState.land_purchased_date}
-                  name="land_purchased_date"
+                  value={formState.land_purchase_date}
+                  name="land_purchase_date"
+                  required
                   onChange={onChange}
                 />
               </DatePickerWrapper>
             </Grid>
 
-            <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
+            <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Box>
-                  <ButtonStyled
-                    component="label"
-                    variant="contained"
-                    htmlFor="account-settings-upload-image"
-                  >
-                    Upload Land Photos
+                  <Typography variant="body1" sx={{marginBottom: 2}}>
+                    Upload Land Certificate
+                  </Typography>
                     <input
-                      hidden
                       type="file"
                       multiple
+                      style={{marginLeft: '1px'}}
                       onChange={onChangeFile}
+                      disabled={uploadingImageStatus}
+                      required
                       accept="image/png, image/jpeg"
                       id="account-settings-upload-image"
                     />
-                  </ButtonStyled>
-
                   <Typography variant="body2" sx={{ marginTop: 5 }}>
                     Allowed PNG or JPEG.
                   </Typography>
@@ -328,7 +366,7 @@ const NewLand = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Previous Owner Cnic"
+                label="Previous Owner CNIC"
                 value={formState.prev_owner_cnic}
                 name="prev_owner_cnic"
                 onChange={onChange}
@@ -345,6 +383,7 @@ const NewLand = () => {
             type="submit"
             sx={{ mr: 2 }}
             variant="contained"
+            disabled={uploadingImageStatus || submissionStatus}
           >
             Submit
           </Button>

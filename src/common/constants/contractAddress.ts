@@ -1,3 +1,1 @@
-
-  export const DLSAddress = "0xe5305E87CdAba3525101FbC80DCa6197851E9C35"
-  
+export const DLSAddress = "0x17FC9D18AcaFEA410aF81eA68B71F845EEF15297";
