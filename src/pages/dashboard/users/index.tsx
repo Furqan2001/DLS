@@ -14,7 +14,7 @@ import UsersTable from "../../../views/Users/Table";
 import { useEffect, useState } from "react";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import { ROLES } from "../../../@core/globals/enums";
-import { getRoles } from "../../../@core/helpers";
+import { getRole } from "../../../@core/helpers";
 
 type TFilterUsers = "users" | ROLES.moderator | ROLES.admin;
 const Users = () => {
@@ -37,7 +37,7 @@ const Users = () => {
         if (user.userAddress !== currentUserAddress) {
           usersList.push({
             accountAddress: user.userAddress,
-            role: getRoles(user.role),
+            role: getRole(user.role),
           });
         }
       });

@@ -1,35 +1,41 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dbConnect from "../../common/libs/dbConnect";
-import AWS from "aws-sdk";
 import nodemailer from "nodemailer";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log("process.env.password ", process.env.password);
+  const { to, subject, message } = req.body;
+  if (!to || !subject || !message)
+    return res
+      .status(400)
+      .send({ message: `{to, subject, message} all fields are required` });
+
   const transporter = nodemailer.createTransport({
-    port: 465,
-    host: "smtp.gmail.com",
-    auth: {
-      user: "ayan.101121@gmail.com", //"securesally@gmail.com",
-      pass: process.env.password2,
+    host: "smtp-mail.outlook.com", // hostname
+    service: "outlook", // service name
+    secureConnection: false,
+    tls: {
+      ciphers: "SSLv3", // tls version
     },
-    secure: false,
+    port: 587, // port
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_USER_PASSWORD,
+    },
   });
 
-  const mailData = {
-    from: "ayan.101121@gmail.com",
-    to: "injurdlion332@gmail.com",
-    subject: `Message From M Ahmed Mushtaq`,
-    text: "message" + " | Sent from: ",
-    html: `<div>${"hello world"}</div><p>Sent from: </p>`,
-  };
+  try {
+    const info = await transporter.sendMail({
+      from: "DLS No-reply <injurdlion332@outlook.com>", // sender address
+      to: to,
+      subject: subject, // Subject line
+      text: message, // plain text body
+      html: `<p>${message}</p>`, // html body
+    });
 
-  transporter.sendMail(mailData, function (err, info) {
-    if (err) console.log(err);
-    else {
-      console.log(info);
-      res.send("success");
-    }
-  });
+    return res.send(info);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 }
 
 export default dbConnect(handler);

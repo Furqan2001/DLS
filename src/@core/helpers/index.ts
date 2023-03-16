@@ -1,7 +1,7 @@
 import { ROLES } from "../globals/enums";
 import { TGenericObj } from "../globals/types";
 
-enum getRole {
+enum SOLIDITY_ENUM_ROLE {
   Visitor = 0,
   Moderator = 1,
   Admin = 2,
@@ -10,8 +10,8 @@ enum getRole {
 export const findUndefinedKeyInObj = (obj: TGenericObj) =>
   Object.keys(obj).find((key) => !obj[key]);
 
-export const getRoles = (role: getRole) => {
-  if (role === getRole.Admin) return ROLES.admin;
-  else if (role === getRole.Moderator) return ROLES.moderator;
+export const getRole = (role: SOLIDITY_ENUM_ROLE) => {
+  if (role === SOLIDITY_ENUM_ROLE.Admin) return ROLES.admin;
+  else if (role === SOLIDITY_ENUM_ROLE.Moderator) return ROLES.moderator;
   else ROLES.visitor;
 };

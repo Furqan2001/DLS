@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { LOCAL_STORAGE_KEYS, ROLES, URLS } from "../../@core/globals/enums";
 import { saveData } from "../../@core/helpers/localStorage";
 import { IBlockchainUserInfo } from "../../@core/globals/types";
-import { getRoles } from "../../@core/helpers";
+import { getRole } from "../../@core/helpers";
 
 const abi = DLSJSON.abi;
 
@@ -60,7 +60,7 @@ const useContract = () => {
       }
     }
 
-    const role = getRoles(user.role);
+    const role = getRole(user.role);
 
     setUserRole(role);
 
@@ -102,7 +102,7 @@ const useContract = () => {
           userAddress: user.userAddress,
           adminApprovalsLeft: Number(user.adminApprovalsLeft),
           modApprovalsLeft: Number(user.modApprovalsLeft),
-          role: getRoles(user.role),
+          role: getRole(user.role),
         };
       } catch (err) {
         console.log("err in fetching the user ", contract, err);
