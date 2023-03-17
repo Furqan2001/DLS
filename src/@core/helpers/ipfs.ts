@@ -17,3 +17,9 @@ export const client: IPFSHTTPClient = ipfsHttpClient({
     authorization: auth,
   },
 });
+
+export const getValueFromHash = async <T>(hash: string): Promise<T> => {
+  const url = DOMAIN_URL + hash;
+  const res = await fetch(url).then((res) => res.json());
+  return res;
+};

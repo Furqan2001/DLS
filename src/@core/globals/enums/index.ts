@@ -3,13 +3,8 @@ export enum URLS {
   usersDetail = "/dashboard/users",
   profile = "/dashboard/account-settings",
   login = "/",
+  landDetail = "/dashboard/lands"
 }
-
-// export enum getRole {
-//   Visitor = 0,
-//   Moderator = 1,
-//   Admin = 2,
-// }
 
 export enum ROLES {
   visitor = "visitor",
@@ -19,4 +14,11 @@ export enum ROLES {
 
 export enum LOCAL_STORAGE_KEYS {
   accountAddress = "accountAddress",
+}
+
+export enum LAND_RECORD_STATUS {
+  pending = "pending",
+  underChangeReview = "underChangeReview",
+  approved = "approved",
+  rejected = "rejected",
 }

@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import { ROLES } from "../../../@core/globals/enums";
 import { getRole } from "../../../@core/helpers";
+import withAuth from "../../../@core/HOC/withAuth";
 
 type TFilterUsers = "users" | ROLES.moderator | ROLES.admin;
 const Users = () => {
@@ -43,7 +44,7 @@ const Users = () => {
       });
       setAllUsers(usersList);
     })();
-  }, [contract, filterUsersList]);
+  }, [!!contract, filterUsersList]);
 
   return (
     <Grid container spacing={6}>
@@ -96,4 +97,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default withAuth(Users);

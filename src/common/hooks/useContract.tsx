@@ -2,19 +2,24 @@ import DLSJSON from "../constants/DLS.json";
 import { ContractInterface, ethers, providers } from "ethers";
 import { DLSAddress } from "../constants/contractAddress";
 import Web3Modal from "web3modal";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { LOCAL_STORAGE_KEYS, ROLES, URLS } from "../../@core/globals/enums";
 import { saveData } from "../../@core/helpers/localStorage";
-import { IBlockchainUserInfo } from "../../@core/globals/types";
-import { getRole } from "../../@core/helpers";
+import { IBlockchainUserInfo, ILandRecord } from "../../@core/globals/types";
+import {
+  convertBigHexNumberToNumber,
+  getLandRecordStatus,
+  getRole,
+  isNullAddress,
+} from "../../@core/helpers";
 
 const abi = DLSJSON.abi;
 
 const fetchContract = (signerOrProvider: ethers.providers.JsonRpcSigner) =>
   new ethers.Contract(DLSAddress, abi, signerOrProvider);
 
-const useContract = () => {
+const useContract = ({ userAddress }: { userAddress: string }) => {
   const [contract, setContract] = useState<ethers.Contract>();
   const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState<ROLES>();
@@ -47,10 +52,13 @@ const useContract = () => {
       return console.log(
         "please try again later. Error in fetching the contract "
       );
+    } else {
+      setContract(contract);
     }
+
     const user = await contract.getUser();
 
-    if (/^0x0+$/.test(user["userAddress"])) {
+    if (isNullAddress(user["userAddress"])) {
       // user is not find, so create a new user
       try {
         await contract.registerNewUser();
@@ -70,14 +78,11 @@ const useContract = () => {
     }
   };
 
- 
-
   const fetchAllUsers = async (
     type: ROLES.admin | ROLES.moderator | "users" = "users"
   ) => {
     let users = [];
 
-    console.log("type is ", type);
     try {
       if (type === "users") {
         users = await contract.fetchAllUsers();
@@ -94,26 +99,29 @@ const useContract = () => {
 
   const fetchSpecificUser = useCallback(
     async (userAddress: string) => {
-      if (!contract) return;
+      if (!contract || !userAddress) return;
+
       try {
         const user = await contract.fetchSingleUser(userAddress);
 
         return {
           userAddress: user.userAddress,
-          adminApprovalsLeft: Number(user.adminApprovalsLeft),
-          modApprovalsLeft: Number(user.modApprovalsLeft),
+          adminApprovalsLeft: convertBigHexNumberToNumber(
+            user.adminApprovalsLeft
+          ),
+          modApprovalsLeft: convertBigHexNumberToNumber(user.modApprovalsLeft),
           role: getRole(user.role),
         };
       } catch (err) {
         console.log("err in fetching the user ", contract, err);
       }
     },
-    [contract]
+    [!!contract, userAddress]
   );
 
   const addNewModerator = useCallback(
     async (userAddress: string) => {
-      if (!contract) return;
+      if (!contract || !userAddress) return;
       setLoading(true);
       try {
         await contract.addNewModerator(userAddress);
@@ -122,12 +130,12 @@ const useContract = () => {
       }
       setLoading(false);
     },
-    [contract]
+    [!!contract, userAddress]
   );
 
   const addNewAdmin = useCallback(
     async (userAddress: string) => {
-      if (!contract) return;
+      if (!contract || !userAddress) return;
       setLoading(true);
       try {
         await contract.addNewAdmin(userAddress);
@@ -136,8 +144,40 @@ const useContract = () => {
       }
       setLoading(false);
     },
-    [contract]
+    [!!contract, userAddress]
   );
+
+  const addNewLandRecord = useCallback(
+    async (ipfsHash: string) => {
+      if (!contract) return;
+      setLoading(true);
+      try {
+        await contract.createProperty(ipfsHash);
+      } catch (err) {
+        console.log("err in making the moderator ", contract, err);
+      }
+      setLoading(false);
+    },
+    [!!contract]
+  );
+
+  const getAllLandRecords = useCallback(async () => {
+    if (!contract) return;
+    setLoading(true);
+    try {
+      const landsRecords = await contract.fetchAllProperties();
+      const lands = landsRecords?.map((land) => ({
+        ipfsHash: land.ipfsHash,
+        itemId: convertBigHexNumberToNumber(land.itemId),
+        status: getLandRecordStatus(land.status),
+      })) as ILandRecord[];
+
+      return lands;
+    } catch (err) {
+      console.log("err in making the moderator ", contract, err);
+    }
+    setLoading(false);
+  }, [!!contract]);
 
   return {
     fetchContractDetails,
@@ -150,6 +190,8 @@ const useContract = () => {
     fetchSpecificUser,
     addNewModerator,
     addNewAdmin,
+    addNewLandRecord,
+    getAllLandRecords,
   };
 };
 

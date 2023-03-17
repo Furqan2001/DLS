@@ -36,20 +36,21 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-import useToFetchUserData from "../../../@core/hooks/useToFetchUserData";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import { IBlockchainUserInfo, IDbUserInfo } from "../../../@core/globals/types";
 import { ROLES } from "../../../@core/globals/enums";
 import LoadingButton from "../../../@core/components/shared/LoadingButton";
 import { useUserInfo } from "../../../common/context/UserInfoContext";
+import withAuth from "../../../@core/HOC/withAuth";
 
-const FormLayoutsBasic = () => {
+const UserAccountInfo = () => {
   // ** States
 
   const [blockchainUserInfo, setBlockchainUserInfo] =
     useState<IBlockchainUserInfo>();
 
   const router = useRouter();
+  const { contract } = useDLSContext();
 
   const { accountAddress } = router.query;
 
@@ -72,7 +73,7 @@ const FormLayoutsBasic = () => {
     } catch (err) {
       console.log("err in fetching the user details ", err);
     }
-  }, [accountAddress]);
+  }, [accountAddress, contract]);
 
   useEffect(() => {
     fetchUserBlockchainInfo();
@@ -212,8 +213,8 @@ const FormLayoutsBasic = () => {
                           : blockchainUserInfo.adminApprovalsLeft}{" "}
                         approvals requires to become
                         {blockchainUserInfo.role === ROLES.visitor
-                          ? "moderator"
-                          : "admin"}
+                          ? " moderator"
+                          : " admin"}
                       </Alert>
                     </Grid>
                   </>
@@ -226,4 +227,4 @@ const FormLayoutsBasic = () => {
   );
 };
 
-export default FormLayoutsBasic;
+export default withAuth(UserAccountInfo);

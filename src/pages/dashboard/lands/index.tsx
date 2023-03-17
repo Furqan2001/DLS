@@ -13,11 +13,22 @@ import Link from "@mui/material/Link";
 import ModeratorTable from "../../../views/Users/Table";
 import { useEffect, useState } from "react";
 import { useDLSContext } from "../../../common/context/DLSContext";
+import withAuth from "../../../@core/HOC/withAuth";
+import { ILandRecord } from "../../../@core/globals/types";
+import LandTable from "../../../views/Lands/Table";
 
-const Moderators = () => {
+const Lands = () => {
   const [filterUsersList, setFilterUsersList] = useState("all");
-  const {} = useDLSContext();
-  const [allUsers, setAllUsers] = useState([]);
+  const { getAllLandRecords } = useDLSContext();
+  const [landRecords, setLandRecords] = useState<ILandRecord[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const res = (await getAllLandRecords()) as ILandRecord[];
+      if (res && Object.keys(res).length === 0) return;
+      setLandRecords(res);
+    })();
+  }, [getAllLandRecords]);
 
   return (
     <Grid container spacing={6}>
@@ -62,11 +73,11 @@ const Moderators = () => {
             }
             titleTypographyProps={{ variant: "h6" }}
           />
-          <ModeratorTable data={allUsers} />
+          <LandTable data={landRecords} />
         </Card>
       </Grid>
     </Grid>
   );
 };
 
-export default Moderators;
+export default withAuth(Lands);

@@ -14,6 +14,9 @@ const initialValue = {
   fetchSpecificUser: async (userAddress: string) => ({}),
   addNewModerator: async (userAddress: string) => {},
   addNewAdmin: async (userAddress: string) => {},
+  addNewLandRecord: async (ipfsHash: string) => {},
+  refreshLogin: async (address: string, skipCurrentLogin: boolean) => {},
+  getAllLandRecords: async () => ({}),
   userAddress: "",
   err: null,
   loading: false,
@@ -31,7 +34,7 @@ export const DLSContextProvider = ({ children }) => {
   const [userAddress, setUserAddress] = useState("");
   const [err, setErr] = useState(null);
 
-  const contract = useContract();
+  const contractFile = useContract({ userAddress });
 
   const accountChangedHandler = async (newAccount) => {
     const address = await newAccount.getAddress();
@@ -39,7 +42,7 @@ export const DLSContextProvider = ({ children }) => {
     setUserAddress(address);
     const balance = await newAccount.getBalance();
 
-    await contract.loginUser(address);
+    await contractFile.loginUser(address);
   };
 
   const connectToWallet = async () => {
@@ -51,7 +54,7 @@ export const DLSContextProvider = ({ children }) => {
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    contract.setLoading(true);
+    contractFile.setLoading(true);
     try {
       await provider.send("eth_requestAccounts", []);
 
@@ -59,19 +62,13 @@ export const DLSContextProvider = ({ children }) => {
     } catch (err) {
       console.log("err in connectToWallet ", err);
     }
-    contract.setLoading(false);
+    contractFile.setLoading(false);
   };
 
-  useEffect(() => {
-    (async () => {
-      const address = getData(LOCAL_STORAGE_KEYS.accountAddress);
-
-      if (!!address) {
-        await contract.loginUser(address, true);
-        setUserAddress(address);
-      }
-    })();
-  }, []);
+  const refreshLogin = async (address: string, skipCurrentLogin: boolean) => {
+    await contractFile.loginUser(address, skipCurrentLogin);
+    setUserAddress(address);
+  };
 
   return (
     <DLSContext.Provider
@@ -79,8 +76,8 @@ export const DLSContextProvider = ({ children }) => {
         connectToWallet,
         userAddress,
         err,
-        contract,
-        ...contract,
+        refreshLogin,
+        ...contractFile,
       }}
     >
       {children}

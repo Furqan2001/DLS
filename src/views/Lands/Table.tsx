@@ -10,15 +10,15 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TablePagination from "@mui/material/TablePagination";
-import { IGenericColor } from "../../@core/globals/types";
+import { IGenericColor, ILandRecord } from "../../@core/globals/types";
 import { Chip } from "@mui/material";
 import Link from "next/link";
-import { ROLES, URLS } from "../../@core/globals/enums";
+import { LAND_RECORD_STATUS, ROLES, URLS } from "../../@core/globals/enums";
 import LoadingButton from "../../@core/components/shared/LoadingButton";
 import { useRouter } from "next/router";
 
 interface Column {
-  id: "name" | "email" | "accountAddress" | "role" | "actions";
+  id: "ipfsHash" | "itemId" | "status" | "actions";
   label: string;
   minWidth?: number;
   align?: "right";
@@ -26,8 +26,9 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: "accountAddress", label: "Account Address", minWidth: 170 },
-  { id: "role", label: "Role", minWidth: 100 },
+  { id: "itemId", label: "Id", minWidth: 100 },
+  { id: "ipfsHash", label: "IPFS HASH", minWidth: 200 },
+  { id: "status", label: "Status", minWidth: 100 },
   { id: "actions", label: "Actions", minWidth: 100 },
 ];
 
@@ -41,17 +42,18 @@ function createData(accountAddress: string, role: ROLES): Data {
 }
 
 const roleColorObj: IGenericColor = {
-  [ROLES.admin]: { color: "primary" },
-  [ROLES.moderator]: { color: "info" },
-  [ROLES.visitor]: { color: "success" },
+  [LAND_RECORD_STATUS.rejected]: { color: "error" },
+  [LAND_RECORD_STATUS.approved]: { color: "primary" },
+  [LAND_RECORD_STATUS.pending]: { color: "info" },
+  [LAND_RECORD_STATUS.underChangeReview]: { color: "secondary" },
 };
 
 interface IProps {
   tableRole?: "admin" | "moderator";
-  data?: { accountAddress: string; role: ROLES }[];
+  data?: ILandRecord[];
 }
 
-const Table = ({ tableRole, data = [] }: IProps) => {
+const LandTable = ({ tableRole, data = [] }: IProps) => {
   // ** States
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -66,8 +68,8 @@ const Table = ({ tableRole, data = [] }: IProps) => {
     setPage(0);
   };
 
-  const openModeratorInfo = (accountAddress: string) => {
-    router.push(`${URLS.usersDetail}/${accountAddress}`);
+  const openLandRecord = (ipfsHash: string) => {
+    router.push(`${URLS.landDetail}/${ipfsHash}`);
   };
 
   return (
@@ -96,16 +98,16 @@ const Table = ({ tableRole, data = [] }: IProps) => {
                     hover
                     role="checkbox"
                     tabIndex={-1}
-                    key={row.accountAddress}
+                    key={row.itemId}
                   >
                     {columns.map((column) => {
                       const value = row[column.id];
 
-                      if (column.id === "role") {
+                      if (column.id === "status") {
                         return (
                           <TableCell key={column.id}>
                             <Chip
-                              label={row.role}
+                              label={row.status}
                               color={roleColorObj[value]?.color}
                               sx={{
                                 height: 24,
@@ -124,7 +126,7 @@ const Table = ({ tableRole, data = [] }: IProps) => {
                               sx={{ color: "white" }}
                               size="small"
                               onClick={() => {
-                                openModeratorInfo(row.accountAddress);
+                                openLandRecord(row.ipfsHash);
                               }}
                             >
                               Open
@@ -160,4 +162,4 @@ const Table = ({ tableRole, data = [] }: IProps) => {
   );
 };
 
-export default Table;
+export default LandTable;
