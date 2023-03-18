@@ -16,6 +16,7 @@ contract DLS {
         Role role;
         address[] modApprovals;
         address[] adminApprovals;
+        address[] removalRequests;
     }
 
     struct UserReturnItem {
@@ -25,6 +26,8 @@ contract DLS {
         uint256 modApprovalsLeft;
         address[] adminApprovals;
         uint256 adminApprovalsLeft;
+        address[] removalRequests;
+        uint256 removalRequestsLeft;
     }
 
     address[] usersAddresses;
@@ -47,6 +50,8 @@ contract DLS {
         uint256 itemId;
         Status status;
         string ipfsHash;
+        address addedBy;
+        address updatedBy;
     }
 
     mapping(uint256 => PropertyItem) private idToPropertyItem;
@@ -124,6 +129,7 @@ contract DLS {
 
         if (users[_newModerator].modApprovals.length >= majorityAdminCount) {
             users[_newModerator].role = Role.Moderator;
+            delete users[_newModerator].removalRequests;
             totalModerators.increment();
         }
         return true;
@@ -150,7 +156,44 @@ contract DLS {
 
         if (users[_newAdmin].adminApprovals.length >= majorityAdminCount) {
             users[_newAdmin].role = Role.Admin;
+            delete users[_newAdmin].removalRequests;
             totalAdmins.increment();
+        }
+        return true;
+    }
+
+    //Demote a user from the status of admin/moderator
+    function demoteUser(
+        address _userAddress
+    ) public verifiedAdmin returns (bool) {
+        require(users[_userAddress].isRegistered, "User does not exist!");
+        require(
+            users[_userAddress].role != Role.Visitor,
+            "User cannot be demoted!"
+        );
+
+        uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
+
+        for (
+            uint256 i = 0;
+            i < users[_userAddress].removalRequests.length;
+            i++
+        ) {
+            if (users[_userAddress].removalRequests[i] == msg.sender) {
+                revert();
+            }
+        }
+        users[_userAddress].removalRequests.push(msg.sender);
+
+        if (users[_userAddress].removalRequests.length >= majorityAdminCount) {
+            if (users[_userAddress].role == Role.Admin) {
+                totalAdmins.decrement();
+            } else {
+                totalModerators.decrement();
+            }
+            users[_userAddress].role = Role.Visitor;
+            delete users[_userAddress].modApprovals;
+            delete users[_userAddress].adminApprovals;
         }
         return true;
     }
@@ -184,6 +227,10 @@ contract DLS {
         userItem.adminApprovalsLeft =
             majorityAdminCount -
             users[userAddress].adminApprovals.length;
+        userItem.removalRequests = users[userAddress].removalRequests;
+        userItem.removalRequestsLeft =
+            majorityAdminCount -
+            users[userAddress].removalRequests.length;
 
         return userItem;
     }
@@ -267,7 +314,9 @@ contract DLS {
         idToPropertyItem[itemId] = PropertyItem(
             itemId,
             Status.Pending,
-            _ipfsHashValue
+            _ipfsHashValue,
+            msg.sender,
+            address(0)
         );
     }
 
@@ -302,17 +351,18 @@ contract DLS {
         ownershipChangeItems[_itemId] = PropertyItem(
             _itemId,
             Status.UnderChangeReview,
-            idToPropertyItem[_itemId].ipfsHash
+            idToPropertyItem[_itemId].ipfsHash,
+            idToPropertyItem[_itemId].addedBy,
+            msg.sender
         );
         idToPropertyItem[_itemId].status = Status.UnderChangeReview;
         idToPropertyItem[_itemId].ipfsHash = _ipfsHashValue;
+        idToPropertyItem[_itemId].updatedBy = msg.sender;
     }
 
     // Approve Change of Property Ownership
     function approveOwnershipChange(uint256 _itemId) public verifiedAdmin {
         idToPropertyItem[_itemId].status = Status.Approved;
-        // idToPropertyItem[_itemId].ipfsHash = ownershipChangeItems[_itemId]
-        //     .ipfsHash;
         delete ownershipChangeItems[_itemId];
     }
 
@@ -321,7 +371,15 @@ contract DLS {
         idToPropertyItem[_itemId].status = Status.Approved;
         idToPropertyItem[_itemId].ipfsHash = ownershipChangeItems[_itemId]
             .ipfsHash;
+        idToPropertyItem[_itemId].updatedBy = address(0);
         delete ownershipChangeItems[_itemId];
+    }
+
+    //fetch a single property
+    function fetchSingleProperty(
+        uint256 _itemId
+    ) public view returns (PropertyItem memory) {
+        return idToPropertyItem[_itemId];
     }
 
     // fetch all created Properties
