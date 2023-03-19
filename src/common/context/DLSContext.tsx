@@ -17,11 +17,14 @@ const initialValue = {
   addNewLandRecord: async (ipfsHash: string) => {},
   refreshLogin: async (address: string, skipCurrentLogin: boolean) => {},
   getAllLandRecords: async () => ({}),
+  approveProperty: async (itemId: number) => {},
+  rejectProperty: async (itemId: number) => {},
   userAddress: "",
   err: null,
   loading: false,
   contract: null,
   userRole: ROLES.visitor,
+  contractErr: "",
 };
 
 const DLSContext = createContext(initialValue);

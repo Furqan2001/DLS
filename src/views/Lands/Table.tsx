@@ -68,8 +68,8 @@ const LandTable = ({ tableRole, data = [] }: IProps) => {
     setPage(0);
   };
 
-  const openLandRecord = (ipfsHash: string) => {
-    router.push(`${URLS.landDetail}/${ipfsHash}`);
+  const openLandRecord = (ipfsHash: string, itemId: number) => {
+    window.location.href = `${URLS.landDetail}/${ipfsHash}?itemId=${itemId}`;
   };
 
   return (
@@ -126,7 +126,7 @@ const LandTable = ({ tableRole, data = [] }: IProps) => {
                               sx={{ color: "white" }}
                               size="small"
                               onClick={() => {
-                                openLandRecord(row.ipfsHash);
+                                openLandRecord(row.ipfsHash, row.itemId);
                               }}
                             >
                               Open

@@ -56,15 +56,16 @@ import {
 import AddNewLand from "../../../views/Lands/AddNewLand";
 
 const LandDetail = () => {
-  // ** States
-
-  const [blockchainUserInfo, setBlockchainUserInfo] =
-    useState<IBlockchainUserInfo>();
-
   const router = useRouter();
   const [formState, setFormState] = useState<IIPFSRecord>();
 
-  const { ipfsHash } = router.query;
+  const { ipfsHash, itemId } = router.query;
+  const {
+    approveProperty,
+    rejectProperty,
+    contractErr,
+    loading: contractActionLoading,
+  } = useDLSContext();
 
   useEffect(() => {
     if (!ipfsHash) return;
@@ -72,7 +73,6 @@ const LandDetail = () => {
     (async () => {
       try {
         const res = await getValueFromHash<IIPFSRecord>(ipfsHash as string);
-        console.log("res ", res);
 
         setFormState({
           ...res,
@@ -85,6 +85,14 @@ const LandDetail = () => {
       }
     })();
   }, [ipfsHash]);
+
+  const handleApproveProperty = async () => {
+    await approveProperty(Number(itemId));
+  };
+
+  const handleRejectProperty = async () => {
+    await rejectProperty(Number(itemId));
+  };
 
   return (
     <>
@@ -99,6 +107,11 @@ const LandDetail = () => {
             <Divider />
             <CardContent>
               <AddNewLand hideFileField formState={formState} />
+              <Typography fontSize={12}>
+                Each action will take approx 2-3 mins, so please wait after
+                pressing the button. So if you see no changes even after 2-3
+                mins, then please wait more 5-10 mins
+              </Typography>
             </CardContent>
 
             <CardActions>
@@ -107,16 +120,31 @@ const LandDetail = () => {
                 type="submit"
                 sx={{ mr: 2 }}
                 variant="contained"
+                loading={contractActionLoading}
+                onClick={handleApproveProperty}
               >
                 Approve
               </LoadingButton>
               <LoadingButton
                 size="large"
                 type="submit"
+                color="error"
                 sx={{ mr: 2 }}
                 variant="contained"
+                loading={contractActionLoading}
+                onClick={handleRejectProperty}
               >
                 Reject
+              </LoadingButton>
+              <LoadingButton
+                size="large"
+                type="submit"
+                color="secondary"
+                sx={{ mr: 2 }}
+                variant="contained"
+                loading={contractActionLoading}
+              >
+                Change Request
               </LoadingButton>
               <a
                 target="_blank"
@@ -127,6 +155,11 @@ const LandDetail = () => {
                 Check Certificate
               </a>
             </CardActions>
+            {contractErr && (
+              <Alert color="error" sx={{ ml: 1 }}>
+                {contractErr}
+              </Alert>
+            )}
           </>
         )}
       </Card>

@@ -56,7 +56,7 @@ const UserDropdown = () => {
 
   const logout = async () => {
     removeData(LOCAL_STORAGE_KEYS.accountAddress);
-    handleDropdownClose(URLS.login);
+    window.location.href = URLS.login;
   };
 
   const styles = {

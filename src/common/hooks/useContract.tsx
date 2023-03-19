@@ -23,8 +23,14 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
   const [contract, setContract] = useState<ethers.Contract>();
   const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState<ROLES>();
+  const [contractErr, setContractErr] = useState("");
 
   const router = useRouter();
+
+  const trackApiUtility = () => {
+    setLoading(true);
+    setContractErr("");
+  };
 
   const fetchContractDetails = async () => {
     try {
@@ -179,6 +185,40 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
     setLoading(false);
   }, [!!contract]);
 
+  const approveProperty = useCallback(
+    async (itemId: number) => {
+      if (!contract) return;
+      trackApiUtility();
+      try {
+        await contract.approveProperty(itemId);
+      } catch (err) {
+        console.log("err in making the moderator ", contract);
+        setContractErr(String(err?.error?.message));
+      }
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000);
+    },
+    [!!contract]
+  );
+
+  const rejectProperty = useCallback(
+    async (itemId: number) => {
+      if (!contract) return;
+      trackApiUtility();
+      try {
+        await contract.rejectProperty(itemId);
+      } catch (err) {
+        console.log("err in making the moderator ", contract, err);
+        setContractErr(String(err?.error?.message));
+      }
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000);
+    },
+    [!!contract]
+  );
+
   return {
     fetchContractDetails,
     loginUser,
@@ -186,12 +226,15 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
     contract,
     loading,
     userRole,
+    contractErr,
     setLoading,
     fetchSpecificUser,
     addNewModerator,
     addNewAdmin,
     addNewLandRecord,
     getAllLandRecords,
+    approveProperty,
+    rejectProperty,
   };
 };
 
