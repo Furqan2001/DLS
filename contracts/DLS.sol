@@ -262,22 +262,7 @@ contract DLS {
         verifiedAdmin
         returns (UserItem[] memory)
     {
-        uint256 allUsersCount = usersAddresses.length;
-        uint256 currentIndex = 0;
-
-        UserItem[] memory allModerators = new UserItem[](
-            totalModerators.current()
-        );
-        for (uint256 i = 0; i < allUsersCount; i++) {
-            address UAddress = usersAddresses[i];
-            if (users[UAddress].role == Role.Moderator) {
-                UserItem storage currentUser = users[UAddress];
-                allModerators[currentIndex] = currentUser;
-                currentIndex++;
-            }
-        }
-
-        return allModerators;
+        return fetchSpecificUsers(totalModerators.current(), Role.Moderator);
     }
 
     // fetch all Admins
@@ -287,20 +272,27 @@ contract DLS {
         verifiedAdmin
         returns (UserItem[] memory)
     {
+        return fetchSpecificUsers(totalAdmins.current(), Role.Admin);
+    }
+
+    function fetchSpecificUsers(
+        uint256 totalUsers,
+        Role role
+    ) private view verifiedAdmin returns (UserItem[] memory) {
         uint256 allUsersCount = usersAddresses.length;
         uint256 currentIndex = 0;
 
-        UserItem[] memory allAdmins = new UserItem[](totalAdmins.current());
+        UserItem[] memory allUsers = new UserItem[](totalUsers);
         for (uint256 i = 0; i < allUsersCount; i++) {
             address UAddress = usersAddresses[i];
-            if (users[UAddress].role == Role.Admin) {
+            if (users[UAddress].role == role) {
                 UserItem storage currentUser = users[UAddress];
-                allAdmins[currentIndex] = currentUser;
+                allUsers[currentIndex] = currentUser;
                 currentIndex++;
             }
         }
 
-        return allAdmins;
+        return allUsers;
     }
 
     // Property Functions
