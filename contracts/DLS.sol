@@ -332,12 +332,16 @@ contract DLS {
     }
 
     // Reject a Property
-    function rejectProperty(uint256 _itemId) public verifiedAdmin {
+    function rejectProperty(
+        uint256 _itemId,
+        string memory rejectionMessage
+    ) public verifiedAdmin {
         require(
             idToPropertyItem[_itemId].status == Status.Pending,
             "Property already Approved or Rejected"
         );
         idToPropertyItem[_itemId].status = Status.Rejected;
+        idToPropertyItem[_itemId].message = rejectionMessage;
         // delete idToPropertyItem[_itemId];
     }
 
