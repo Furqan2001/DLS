@@ -52,6 +52,7 @@ contract DLS {
         string ipfsHash;
         address addedBy;
         address updatedBy;
+        string message;
     }
 
     mapping(uint256 => PropertyItem) private idToPropertyItem;
@@ -210,7 +211,7 @@ contract DLS {
         return fetchUser(userAddress);
     }
 
-    // fetch a specific user private func
+    // fetch a specific user private function
     function fetchUser(
         address userAddress
     ) private view returns (UserReturnItem memory) {
@@ -316,7 +317,8 @@ contract DLS {
             Status.Pending,
             _ipfsHashValue,
             msg.sender,
-            address(0)
+            address(0),
+            ""
         );
     }
 
@@ -353,7 +355,8 @@ contract DLS {
             Status.UnderChangeReview,
             idToPropertyItem[_itemId].ipfsHash,
             idToPropertyItem[_itemId].addedBy,
-            msg.sender
+            msg.sender,
+            ""
         );
         idToPropertyItem[_itemId].status = Status.UnderChangeReview;
         idToPropertyItem[_itemId].ipfsHash = _ipfsHashValue;
@@ -362,16 +365,28 @@ contract DLS {
 
     // Approve Change of Property Ownership
     function approveOwnershipChange(uint256 _itemId) public verifiedAdmin {
+        require(
+            idToPropertyItem[_itemId].status == Status.UnderChangeReview,
+            "No ownership request for the designated property exists"
+        );
         idToPropertyItem[_itemId].status = Status.Approved;
         delete ownershipChangeItems[_itemId];
     }
 
     // Reject Change of Property Ownership
-    function rejectOwnershipChange(uint256 _itemId) public verifiedAdmin {
+    function rejectOwnershipChange(
+        uint256 _itemId,
+        string memory rejectionMessage
+    ) public verifiedAdmin {
+        require(
+            idToPropertyItem[_itemId].status == Status.UnderChangeReview,
+            "No ownership request for the designated property exists"
+        );
         idToPropertyItem[_itemId].status = Status.Approved;
         idToPropertyItem[_itemId].ipfsHash = ownershipChangeItems[_itemId]
             .ipfsHash;
         idToPropertyItem[_itemId].updatedBy = address(0);
+        idToPropertyItem[_itemId].message = rejectionMessage;
         delete ownershipChangeItems[_itemId];
     }
 
@@ -404,29 +419,7 @@ contract DLS {
         view
         returns (PropertyItem[] memory)
     {
-        uint256 itemCount = _itemIds.current();
-        uint256 approvedPropertyCount = 0;
-        uint256 currentIndex = 0;
-
-        for (uint256 i = 0; i < itemCount; i++) {
-            if (idToPropertyItem[i + 1].status == Status.Approved) {
-                approvedPropertyCount++;
-            }
-        }
-
-        PropertyItem[] memory properties = new PropertyItem[](
-            approvedPropertyCount
-        );
-        for (uint256 i = 0; i < itemCount; i++) {
-            if (idToPropertyItem[i + 1].status == Status.Approved) {
-                uint256 currentId = i + 1;
-                PropertyItem storage currentItem = idToPropertyItem[currentId];
-                properties[currentIndex] = currentItem;
-                currentIndex++;
-            }
-        }
-
-        return properties;
+        return fetchSpecificStatusProperties(Status.Approved);
     }
 
     // fetch all Rejected Properties
@@ -436,29 +429,7 @@ contract DLS {
         verifiedModeratorORAdmin
         returns (PropertyItem[] memory)
     {
-        uint256 itemCount = _itemIds.current();
-        uint256 rejectedPropertyCount = 0;
-        uint256 currentIndex = 0;
-
-        for (uint256 i = 0; i < itemCount; i++) {
-            if (idToPropertyItem[i + 1].status == Status.Rejected) {
-                rejectedPropertyCount++;
-            }
-        }
-
-        PropertyItem[] memory properties = new PropertyItem[](
-            rejectedPropertyCount
-        );
-        for (uint256 i = 0; i < itemCount; i++) {
-            if (idToPropertyItem[i + 1].status == Status.Rejected) {
-                uint256 currentId = i + 1;
-                PropertyItem storage currentItem = idToPropertyItem[currentId];
-                properties[currentIndex] = currentItem;
-                currentIndex++;
-            }
-        }
-
-        return properties;
+        return fetchSpecificStatusProperties(Status.Rejected);
     }
 
     // fetch all Pending Properties
@@ -468,30 +439,7 @@ contract DLS {
         verifiedModeratorORAdmin
         returns (PropertyItem[] memory)
     {
-        uint256 itemCount = _itemIds.current();
-        uint256 pendingPropertyCount = 0;
-        uint256 currentIndex = 0;
-
-        for (uint256 i = 0; i < itemCount; i++) {
-            if (idToPropertyItem[i + 1].status == Status.Pending) {
-                pendingPropertyCount++;
-            }
-        }
-
-        PropertyItem[] memory properties = new PropertyItem[](
-            pendingPropertyCount
-        );
-
-        for (uint256 i = 0; i < itemCount; i++) {
-            if (idToPropertyItem[i + 1].status == Status.Pending) {
-                uint256 currentId = i + 1;
-                PropertyItem storage currentItem = idToPropertyItem[currentId];
-                properties[currentIndex] = currentItem;
-                currentIndex++;
-            }
-        }
-
-        return properties;
+        return fetchSpecificStatusProperties(Status.Pending);
     }
 
     // fetch all UnderReview Properties
@@ -501,22 +449,27 @@ contract DLS {
         verifiedModeratorORAdmin
         returns (PropertyItem[] memory)
     {
+        return fetchSpecificStatusProperties(Status.UnderChangeReview);
+    }
+
+    // fetch all UnderReview Properties
+    function fetchSpecificStatusProperties(
+        Status propertyStatus
+    ) private view verifiedModeratorORAdmin returns (PropertyItem[] memory) {
         uint256 itemCount = _itemIds.current();
-        uint256 underReviewPropertyCount = 0;
+        uint256 propertyCount = 0;
         uint256 currentIndex = 0;
 
         for (uint256 i = 0; i < itemCount; i++) {
-            if (idToPropertyItem[i + 1].status == Status.UnderChangeReview) {
-                underReviewPropertyCount++;
+            if (idToPropertyItem[i + 1].status == propertyStatus) {
+                propertyCount++;
             }
         }
 
-        PropertyItem[] memory properties = new PropertyItem[](
-            underReviewPropertyCount
-        );
+        PropertyItem[] memory properties = new PropertyItem[](propertyCount);
 
         for (uint256 i = 0; i < itemCount; i++) {
-            if (idToPropertyItem[i + 1].status == Status.UnderChangeReview) {
+            if (idToPropertyItem[i + 1].status == propertyStatus) {
                 uint256 currentId = i + 1;
                 PropertyItem storage currentItem = idToPropertyItem[currentId];
                 properties[currentIndex] = currentItem;
