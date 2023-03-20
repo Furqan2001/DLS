@@ -1,5 +1,5 @@
 import DLSJSON from "../constants/DLS.json";
-import { ContractInterface, ethers, providers } from "ethers";
+import { BigNumber, ContractInterface, ethers, providers } from "ethers";
 import { DLSAddress } from "../constants/contractAddress";
 import Web3Modal from "web3modal";
 import { useCallback, useEffect, useState } from "react";
@@ -161,8 +161,11 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
         await contract.createProperty(ipfsHash);
       } catch (err) {
         console.log("err in making the moderator ", contract, err);
+        setContractErr(String(err?.error?.message));
       }
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000);
     },
     [!!contract]
   );
@@ -219,6 +222,24 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
     [!!contract]
   );
 
+  const fetchSinglePropertyInfo = useCallback(
+    async (itemId: string) => {
+      if (!contract) return;
+      trackApiUtility();
+      let propertyInfo: ILandRecord;
+      try {
+        propertyInfo = await contract.fetchSingleProperty(
+          BigNumber.from(itemId)
+        );
+      } catch (err) {
+        console.log("err in fetching single property info ", err);
+        setContractErr(String(err?.error?.message));
+      }
+      return propertyInfo;
+    },
+    [!!contract]
+  );
+
   return {
     fetchContractDetails,
     loginUser,
@@ -235,6 +256,7 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
     getAllLandRecords,
     approveProperty,
     rejectProperty,
+    fetchSinglePropertyInfo,
   };
 };
 

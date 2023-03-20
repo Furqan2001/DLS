@@ -43,6 +43,7 @@ import {
   IBlockchainUserInfo,
   IDbUserInfo,
   IIPFSRecord,
+  ILandRecord,
 } from "../../../@core/globals/types";
 import { ROLES } from "../../../@core/globals/enums";
 import LoadingButton from "../../../@core/components/shared/LoadingButton";
@@ -54,15 +55,19 @@ import {
   getValueFromHash,
 } from "../../../@core/helpers/ipfs";
 import AddNewLand from "../../../views/Lands/AddNewLand";
+import { isEmptyObject } from "../../../@core/helpers";
+import LandStatusActionButton from "../../../views/Lands/LandStatusActionButton";
 
 const LandDetail = () => {
   const router = useRouter();
   const [formState, setFormState] = useState<IIPFSRecord>();
+  const [landRecord, setLandRecord] = useState<ILandRecord>();
 
   const { ipfsHash, itemId } = router.query;
   const {
     approveProperty,
     rejectProperty,
+    fetchSinglePropertyInfo,
     contractErr,
     loading: contractActionLoading,
   } = useDLSContext();
@@ -86,12 +91,26 @@ const LandDetail = () => {
     })();
   }, [ipfsHash]);
 
-  const handleApproveProperty = async () => {
-    await approveProperty(Number(itemId));
-  };
+  useEffect(() => {
+    if (!itemId) return;
+    (async () => {
+      const res = (await fetchSinglePropertyInfo(itemId as string)) as
+        | ILandRecord
+        | {};
 
-  const handleRejectProperty = async () => {
-    await rejectProperty(Number(itemId));
+      console.log("res is ", res);
+      if (isEmptyObject(res)) return;
+
+      setLandRecord(res as ILandRecord);
+    })();
+  }, [fetchSinglePropertyInfo, itemId]);
+
+  const handleAction = async (type: "approve" | "reject") => {
+    if (type === "approve") {
+      return await approveProperty(Number(itemId));
+    } else if (type === "reject") {
+      return await rejectProperty(Number(itemId));
+    }
   };
 
   return (
@@ -102,7 +121,7 @@ const LandDetail = () => {
           titleTypographyProps={{ variant: "h6" }}
         />
 
-        {formState && (
+        {formState && landRecord && (
           <>
             <Divider />
             <CardContent>
@@ -115,37 +134,11 @@ const LandDetail = () => {
             </CardContent>
 
             <CardActions>
-              <LoadingButton
-                size="large"
-                type="submit"
-                sx={{ mr: 2 }}
-                variant="contained"
-                loading={contractActionLoading}
-                onClick={handleApproveProperty}
-              >
-                Approve
-              </LoadingButton>
-              <LoadingButton
-                size="large"
-                type="submit"
-                color="error"
-                sx={{ mr: 2 }}
-                variant="contained"
-                loading={contractActionLoading}
-                onClick={handleRejectProperty}
-              >
-                Reject
-              </LoadingButton>
-              <LoadingButton
-                size="large"
-                type="submit"
-                color="secondary"
-                sx={{ mr: 2 }}
-                variant="contained"
-                loading={contractActionLoading}
-              >
-                Change Request
-              </LoadingButton>
+              <LandStatusActionButton
+                landStatus={landRecord?.status}
+                contractActionLoading={contractActionLoading}
+                handleAction={handleAction}
+              />
               <a
                 target="_blank"
                 rel="noreferrer"

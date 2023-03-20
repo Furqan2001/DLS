@@ -42,3 +42,6 @@ export const getLandRecordStatus = (status: SOLIDITY_LAND_RECORDS_STATUS) => {
 
 export const convertBigHexNumberToNumber = (bigHexNumber: number) =>
   Number(bigHexNumber);
+
+export const isEmptyObject = (res: TGenericObj) =>
+  !res || Object.keys(res).length === 0;

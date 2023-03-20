@@ -19,6 +19,7 @@ const initialValue = {
   getAllLandRecords: async () => ({}),
   approveProperty: async (itemId: number) => {},
   rejectProperty: async (itemId: number) => {},
+  fetchSinglePropertyInfo: async (itemId: string) => ({}),
   userAddress: "",
   err: null,
   loading: false,

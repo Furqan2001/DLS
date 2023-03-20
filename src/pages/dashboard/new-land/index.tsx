@@ -36,7 +36,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 // ** Styled Components
 import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
-import { Box, styled } from "@mui/material";
+import { Alert, Box, styled } from "@mui/material";
 import LoadingButton from "../../../@core/components/shared/LoadingButton";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import withAuth from "../../../@core/HOC/withAuth";
@@ -90,7 +90,7 @@ const NewLand = () => {
     prev_owner_cnic: "",
   });
 
-  const { addNewLandRecord } = useDLSContext();
+  const { addNewLandRecord, contractErr } = useDLSContext();
 
   async function onChangeFile(e: ChangeEvent) {
     const file = (e.target as HTMLInputElement).files[0];
@@ -137,6 +137,10 @@ const NewLand = () => {
     }
   };
 
+  const onChangeDate = (date: Date) => {
+    setFormState({ ...formState, land_purchase_date: date });
+  };
+
   return (
     <Card>
       <CardHeader
@@ -147,7 +151,8 @@ const NewLand = () => {
       <Divider />
       <CardContent>
         <AddNewLand
-          formState={formState}
+          formState={{ ...formState, certificate: "" }}
+          onChangeDate={onChangeDate}
           onChange={onChange}
           onChangeFile={onChangeFile}
           uploadingImageStatus={uploadingImageStatus}
@@ -165,7 +170,12 @@ const NewLand = () => {
         >
           Submit
         </LoadingButton>
+        <Typography mt={2} fontSize={12}>
+          It will take approx 2-3 mins, so please wait after pressing the
+          button.
+        </Typography>
       </CardActions>
+      {contractErr && <Alert color="error">{contractErr}</Alert>}
     </Card>
   );
 };

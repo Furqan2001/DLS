@@ -43,6 +43,7 @@ interface IProps {
   formState: IIPFSRecord;
   onChange?: (e: any) => void;
   onChangeFile?: (e: any) => void;
+  onChangeDate?: (date: Date) => void;
   uploadingImageStatus?: boolean;
   hideFileField?: boolean;
 }
@@ -71,6 +72,7 @@ const AddNewLand = ({
   onChangeFile,
   uploadingImageStatus,
   hideFileField,
+  onChangeDate,
 }: IProps) => {
   return (
     <Box>
@@ -237,7 +239,7 @@ const AddNewLand = ({
                 value={formState.land_purchase_date}
                 name="land_purchase_date"
                 required
-                onChange={onChange}
+                onChange={onChangeDate}
               />
             </DatePickerWrapper>
           </Grid>
