@@ -7,8 +7,8 @@ module.exports = {
     hardhat: {
       chainId: 1337,
     },
-    goerli: {
-      url: `https://goerli.infura.io/v3/${process.env.PROJECT_ID}`,
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${process.env.PROJECT_ID}`,
       accounts: [process.env.PRIVATE_KEY],
     },
     mainnet: {

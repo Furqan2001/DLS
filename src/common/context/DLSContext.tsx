@@ -18,7 +18,7 @@ const initialValue = {
   refreshLogin: async (address: string, skipCurrentLogin: boolean) => {},
   getAllLandRecords: async () => ({}),
   approveProperty: async (itemId: number) => {},
-  rejectProperty: async (itemId: number) => {},
+  rejectProperty: async (itemId: number, msg: string) => {},
   fetchSinglePropertyInfo: async (itemId: string) => ({}),
   userAddress: "",
   err: null,

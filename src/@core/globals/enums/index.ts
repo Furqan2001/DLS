@@ -3,7 +3,7 @@ export enum URLS {
   usersDetail = "/dashboard/users",
   profile = "/dashboard/account-settings",
   login = "/",
-  landDetail = "/dashboard/lands"
+  allLands = "/dashboard/lands"
 }
 
 export enum ROLES {

@@ -9,7 +9,7 @@ type TColors = "primary" | "secondary" | "error";
 interface IProps {
   contractActionLoading: boolean;
   handleAction: (key: ThandleActionKey) => {};
-  landStatus: LAND_RECORD_STATUS;
+  landStatus?: LAND_RECORD_STATUS;
 }
 
 const allButtons = [
@@ -38,11 +38,12 @@ const LandStatusActionButton = ({
     ) {
       return []; // no button will be show
     } else if (landStatus === LAND_RECORD_STATUS.pending) return allButtons;
+    return [];
   }, [landStatus]);
 
   return (
     <>
-      {buttonsList.map((btn) => (
+      {buttonsList?.map((btn) => (
         <LoadingButton
           key={btn.type}
           color={btn.color}

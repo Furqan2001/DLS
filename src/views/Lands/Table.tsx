@@ -69,7 +69,7 @@ const LandTable = ({ tableRole, data = [] }: IProps) => {
   };
 
   const openLandRecord = (ipfsHash: string, itemId: number) => {
-    window.location.href = `${URLS.landDetail}/${ipfsHash}?itemId=${itemId}`;
+    router.push(`${URLS.allLands}/${ipfsHash}?itemId=${itemId}`);
   };
 
   return (

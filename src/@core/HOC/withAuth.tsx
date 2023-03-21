@@ -9,7 +9,7 @@ const withAuth = (Component) => {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    const { refreshLogin } = useDLSContext();
+    const { refreshLogin, contract } = useDLSContext();
 
     useEffect(() => {
       (async () => {
@@ -21,7 +21,7 @@ const withAuth = (Component) => {
         }
         setLoading(false);
       })();
-    }, []);
+    }, [contract]);
 
     if (loading) return <div>Please wait ...</div>;
 

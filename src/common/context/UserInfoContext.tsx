@@ -51,8 +51,6 @@ const UserInfoContextProvider = ({
   const [loading, setLoading] = useState(false);
   const { userAddress, userRole } = useDLSContext();
 
-  console.log("userRole ", userRole);
-
   const fetchUserDbDetails = useCallback(async (defaultUserAddress: string) => {
     setLoading(true);
     try {

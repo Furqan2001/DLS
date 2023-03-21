@@ -1,12 +1,12 @@
 import DLSJSON from "../constants/DLS.json";
-import { BigNumber, ContractInterface, ethers, providers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { DLSAddress } from "../constants/contractAddress";
 import Web3Modal from "web3modal";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { LOCAL_STORAGE_KEYS, ROLES, URLS } from "../../@core/globals/enums";
 import { saveData } from "../../@core/helpers/localStorage";
-import { IBlockchainUserInfo, ILandRecord } from "../../@core/globals/types";
+import { ILandRecord } from "../../@core/globals/types";
 import {
   convertBigHexNumberToNumber,
   getLandRecordStatus,
@@ -206,13 +206,13 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
   );
 
   const rejectProperty = useCallback(
-    async (itemId: number) => {
+    async (itemId: number, msg: string) => {
       if (!contract) return;
       trackApiUtility();
       try {
-        await contract.rejectProperty(itemId);
+        await contract.rejectProperty(itemId, msg);
       } catch (err) {
-        console.log("err in making the moderator ", contract, err);
+        console.log("err in rejecting the property ", contract, err);
         setContractErr(String(err?.error?.message));
       }
       setTimeout(() => {
@@ -235,6 +235,8 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
         console.log("err in fetching single property info ", err);
         setContractErr(String(err?.error?.message));
       }
+
+      setLoading(false);
       return propertyInfo;
     },
     [!!contract]

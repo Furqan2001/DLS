@@ -45,7 +45,7 @@ import {
   IIPFSRecord,
   ILandRecord,
 } from "../../../@core/globals/types";
-import { ROLES } from "../../../@core/globals/enums";
+import { ROLES, URLS } from "../../../@core/globals/enums";
 import LoadingButton from "../../../@core/components/shared/LoadingButton";
 import { useUserInfo } from "../../../common/context/UserInfoContext";
 import withAuth from "../../../@core/HOC/withAuth";
@@ -55,13 +55,18 @@ import {
   getValueFromHash,
 } from "../../../@core/helpers/ipfs";
 import AddNewLand from "../../../views/Lands/AddNewLand";
-import { isEmptyObject } from "../../../@core/helpers";
+import { getLandRecordStatus, isEmptyObject } from "../../../@core/helpers";
 import LandStatusActionButton from "../../../views/Lands/LandStatusActionButton";
+import CustomModal from "../../../@core/components/shared/CustomModal";
 
 const LandDetail = () => {
   const router = useRouter();
   const [formState, setFormState] = useState<IIPFSRecord>();
   const [landRecord, setLandRecord] = useState<ILandRecord>();
+  const [showRejectionBox, setShowRejectionBox] = useState(false);
+  const [rejectionBoxMsg, setRejectionBoxMsg] = useState("");
+
+  const { userRole } = useUserInfo();
 
   const { ipfsHash, itemId } = router.query;
   const {
@@ -98,21 +103,30 @@ const LandDetail = () => {
         | ILandRecord
         | {};
 
-      console.log("res is ", res);
       if (isEmptyObject(res)) return;
 
-      setLandRecord(res as ILandRecord);
+      //@ts-ignore
+      setLandRecord({ ...res, status: getLandRecordStatus(res.status) });
     })();
   }, [fetchSinglePropertyInfo, itemId]);
 
   const handleAction = async (type: "approve" | "reject") => {
     if (type === "approve") {
-      return await approveProperty(Number(itemId));
+      await approveProperty(Number(itemId));
+      router.push(URLS.allLands);
     } else if (type === "reject") {
-      return await rejectProperty(Number(itemId));
+      setShowRejectionBox(true);
     }
   };
 
+  const handleReject = async () => {
+    if (!rejectionBoxMsg) return;
+
+    await rejectProperty(Number(itemId), rejectionBoxMsg);
+    router.push(URLS.allLands);
+  };
+
+  const isAdmin = userRole === ROLES.admin;
   return (
     <>
       <Card>
@@ -121,7 +135,7 @@ const LandDetail = () => {
           titleTypographyProps={{ variant: "h6" }}
         />
 
-        {formState && landRecord && (
+        {formState && landRecord && isAdmin && (
           <>
             <Divider />
             <CardContent>
@@ -135,9 +149,9 @@ const LandDetail = () => {
 
             <CardActions>
               <LandStatusActionButton
-                landStatus={landRecord?.status}
                 contractActionLoading={contractActionLoading}
                 handleAction={handleAction}
+                landStatus={landRecord?.status}
               />
               <a
                 target="_blank"
@@ -156,6 +170,36 @@ const LandDetail = () => {
           </>
         )}
       </Card>
+
+      <CustomModal
+        open={showRejectionBox}
+        handleClose={() => setShowRejectionBox(false)}
+      >
+        <Box>
+          <Typography sx={{ fontWeight: "bold" }}>
+            Enter a message why are you rejecting the property?
+          </Typography>
+
+          <TextField
+            sx={{ mt: 4, mb: 2 }}
+            multiline
+            minRows={2}
+            label="Message"
+            fullWidth
+            value={rejectionBoxMsg}
+            onChange={(e) => setRejectionBoxMsg(e.target.value)}
+            placeholder="Enter a message why are you rejecting the property?"
+          />
+
+          <LoadingButton
+            fullWidth
+            onClick={handleReject}
+            loading={contractActionLoading}
+          >
+            Submit
+          </LoadingButton>
+        </Box>
+      </CustomModal>
     </>
   );
 };
