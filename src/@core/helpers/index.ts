@@ -1,6 +1,7 @@
 import { LAND_RECORD_STATUS, ROLES } from "../globals/enums";
 import { TGenericObj } from "../globals/types";
 
+
 enum SOLIDITY_ENUM_ROLE {
   Visitor = 0,
   Moderator = 1,
@@ -45,3 +46,9 @@ export const convertBigHexNumberToNumber = (bigHexNumber: number) =>
 
 export const isEmptyObject = (res: TGenericObj) =>
   !res || Object.keys(res).length === 0;
+
+export const generateRandomNumber = (min: number, max: number) => {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};
+

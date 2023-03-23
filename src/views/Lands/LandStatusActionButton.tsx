@@ -37,8 +37,11 @@ const LandStatusActionButton = ({
       landStatus === LAND_RECORD_STATUS.rejected
     ) {
       return []; // no button will be show
-    } else if (landStatus === LAND_RECORD_STATUS.pending) return allButtons;
-    return [];
+    } else if (
+      landStatus === LAND_RECORD_STATUS.pending ||
+      landStatus === LAND_RECORD_STATUS.underChangeReview
+    )
+      return allButtons;
   }, [landStatus]);
 
   return (

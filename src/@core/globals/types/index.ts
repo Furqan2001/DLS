@@ -35,7 +35,7 @@ export interface ILandRecord {
 }
 
 export interface IIPFSRecord {
-  certificate: string;
+  certificate?: string;
   owner_full_name: string;
   owner_father_name: string;
   owner_mother_name: string;
@@ -51,4 +51,11 @@ export interface IIPFSRecord {
   plot_num: string;
   land_purchase_date?: Date;
   prev_owner_cnic?: string;
+  previous_onwers_hashes?: string[];
+}
+
+export interface ISendMail {
+  to: string;
+  subject: string;
+  message: string;
 }

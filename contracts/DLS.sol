@@ -388,6 +388,7 @@ contract DLS {
 
     //fetch a single property
     function fetchSingleProperty(
+    
         uint256 _itemId
     ) public view returns (PropertyItem memory) {
         return idToPropertyItem[_itemId];

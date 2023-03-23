@@ -66,7 +66,7 @@ const CustomInput = forwardRef((props, ref) => (
   />
 ));
 
-const AddNewLand = ({
+const LandDetails = ({
   formState,
   onChange,
   onChangeFile,
@@ -306,4 +306,4 @@ const AddNewLand = ({
   );
 };
 
-export default AddNewLand;
+export default LandDetails;

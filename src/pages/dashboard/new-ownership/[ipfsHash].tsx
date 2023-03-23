@@ -45,7 +45,7 @@ import {
   IIPFSRecord,
   ILandRecord,
 } from "../../../@core/globals/types";
-import { ROLES, URLS } from "../../../@core/globals/enums";
+import { LAND_RECORD_STATUS, ROLES, URLS } from "../../../@core/globals/enums";
 import LoadingButton from "../../../@core/components/shared/LoadingButton";
 import { useUserInfo } from "../../../common/context/UserInfoContext";
 import withAuth from "../../../@core/HOC/withAuth";
@@ -54,13 +54,18 @@ import {
   client,
   getValueFromHash,
 } from "../../../@core/helpers/ipfs";
-import LandDetails from "../../../views/Lands/LandDetails";
+import LandRecordForm from "../../../views/NewLand/LandRecordForm";
 import { getLandRecordStatus, isEmptyObject } from "../../../@core/helpers";
 import LandStatusActionButton from "../../../views/Lands/LandStatusActionButton";
 import CustomModal from "../../../@core/components/shared/CustomModal";
+import { sendEmailConfirmation, sendMail } from "../../../common/api/sendMail";
+import EmailVerification from "../../../views/Ownership/EmailVerification";
 
 const LandDetail = () => {
   const router = useRouter();
+
+  const [showEmailVerificationBox, setShowEmailVerificationBox] =
+    useState(true);
   const [formState, setFormState] = useState<IIPFSRecord>();
   const [landRecord, setLandRecord] = useState<ILandRecord>();
   const [showRejectionBox, setShowRejectionBox] = useState(false);
@@ -83,7 +88,6 @@ const LandDetail = () => {
     (async () => {
       try {
         const res = await getValueFromHash<IIPFSRecord>(ipfsHash as string);
-        console.log("res is ", res);
 
         setFormState({
           ...res,
@@ -107,7 +111,14 @@ const LandDetail = () => {
       if (isEmptyObject(res)) return;
 
       //@ts-ignore
-      setLandRecord({ ...res, status: getLandRecordStatus(res.status) });
+      const status = getLandRecordStatus(res.status);
+
+      if (status === LAND_RECORD_STATUS.approved) {
+        setShowEmailVerificationBox(true);
+      }
+
+      //@ts-ignore
+      setLandRecord({ ...res, status });
     })();
   }, [fetchSinglePropertyInfo, itemId]);
 
@@ -119,89 +130,30 @@ const LandDetail = () => {
       setShowRejectionBox(true);
     }
   };
-
-  const handleReject = async () => {
-    if (!rejectionBoxMsg) return;
-
-    await rejectProperty(Number(itemId), rejectionBoxMsg);
-    if (!contractErr) router.push(URLS.allLands);
-  };
-
   const isAdmin = userRole === ROLES.admin;
+
+  const shouldShowEmailVerificationBox = formState && showEmailVerificationBox;
+  const shouleShowLandRecord = !showEmailVerificationBox && formState;
+
   return (
-    <>
-      <Card>
-        <CardHeader
-          title="Land Details"
-          titleTypographyProps={{ variant: "h6" }}
+    <Box>
+      {/* {shouldShowEmailVerificationBox && (
+        <EmailVerification
+          setShowLandRecord={() => {
+            setShowEmailVerificationBox(false);
+          }}
+          email={formState.owner_email}
         />
-
-        {formState && landRecord && isAdmin && (
-          <>
-            <Divider />
-            <CardContent>
-              <LandDetails hideFileField formState={formState} />
-              <Typography fontSize={12}>
-                Each action will take approx 2-3 mins, so please wait after
-                pressing the button. So if you see no changes even after 2-3
-                mins, then please wait more 5-10 mins
-              </Typography>
-            </CardContent>
-
-            <CardActions>
-              <LandStatusActionButton
-                contractActionLoading={contractActionLoading}
-                handleAction={handleAction}
-                landStatus={landRecord?.status}
-              />
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={formState.certificate}
-                style={{ marginLeft: 10 }}
-              >
-                Check Certificate
-              </a>
-            </CardActions>
-            {contractErr && (
-              <Alert color="error" sx={{ ml: 1 }}>
-                {contractErr}
-              </Alert>
-            )}
-          </>
-        )}
-      </Card>
-
-      <CustomModal
-        open={showRejectionBox}
-        handleClose={() => setShowRejectionBox(false)}
-      >
-        <Box>
-          <Typography sx={{ fontWeight: "bold" }}>
-            Enter a message why are you rejecting the property?
-          </Typography>
-
-          <TextField
-            sx={{ mt: 4, mb: 2 }}
-            multiline
-            minRows={2}
-            label="Message"
-            fullWidth
-            value={rejectionBoxMsg}
-            onChange={(e) => setRejectionBoxMsg(e.target.value)}
-            placeholder="Enter a message why are you rejecting the property?"
-          />
-
-          <LoadingButton
-            fullWidth
-            onClick={handleReject}
-            loading={contractActionLoading}
-          >
-            Submit
-          </LoadingButton>
-        </Box>
-      </CustomModal>
-    </>
+      )} */}
+      {formState && (
+        <LandRecordForm
+          form="transferLandOwnership"
+          ipfsHash={ipfsHash as string}
+          itemId={itemId as string}
+          formState={formState}
+        />
+      )}
+    </Box>
   );
 };
 

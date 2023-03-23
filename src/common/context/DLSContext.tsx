@@ -6,7 +6,12 @@ import { DLSAddress } from "../constants/contractAddress";
 import Web3Modal from "web3modal";
 import useContract from "../hooks/useContract";
 import { getData } from "../../@core/helpers/localStorage";
-import { LOCAL_STORAGE_KEYS, ROLES } from "../../@core/globals/enums";
+import {
+  GET_ALL_LAND_RECORD_STATUS,
+  LAND_RECORD_STATUS,
+  LOCAL_STORAGE_KEYS,
+  ROLES,
+} from "../../@core/globals/enums";
 
 const initialValue = {
   connectToWallet: () => {},
@@ -16,10 +21,11 @@ const initialValue = {
   addNewAdmin: async (userAddress: string) => {},
   addNewLandRecord: async (ipfsHash: string) => {},
   refreshLogin: async (address: string, skipCurrentLogin: boolean) => {},
-  getAllLandRecords: async () => ({}),
+  getAllLandRecords: async (type: GET_ALL_LAND_RECORD_STATUS) => [],
   approveProperty: async (itemId: number) => {},
   rejectProperty: async (itemId: number, msg: string) => {},
   fetchSinglePropertyInfo: async (itemId: string) => ({}),
+  transferLandOwnership: async (itemId: string, ipfsHash: string) => {},
   userAddress: "",
   err: null,
   loading: false,

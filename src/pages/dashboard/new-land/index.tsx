@@ -40,7 +40,8 @@ import { Alert, Box, styled } from "@mui/material";
 import LoadingButton from "../../../@core/components/shared/LoadingButton";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import withAuth from "../../../@core/HOC/withAuth";
-import AddNewLand from "../../../views/Lands/AddNewLand";
+import LandDetails from "../../../views/Lands/LandDetails";
+import LandRecordForm from "../../../views/NewLand/LandRecordForm";
 
 interface State {
   password: string;
@@ -67,117 +68,8 @@ const ButtonStyled = styled(Button)<
 
 // eslint-disable-next-line react/display-name
 
-const NewLand = () => {
-  const [uploadingImageStatus, setuploadingImageStatus] = useState(false);
-  const [submissionStatus, setSubmissionStatus] = useState(false);
-  const [fileUrl, setFileUrl] = useState("");
-  const [formState, setFormState] = useState({
-    owner_full_name: "",
-    owner_father_name: "",
-    owner_mother_name: "",
-    owner_email: "",
-    owner_phone: "",
-    owner_cnic: "",
-    owner_complete_address: "",
-    land_total_area: "",
-    land_amount: "",
-    land_city: "",
-    land_district: "",
-    land_complete_location: "",
-    plot_num: "",
-    // land_complete_land_area: "",
-    land_purchase_date: new Date(),
-    prev_owner_cnic: "",
-  });
-
-  const { addNewLandRecord, contractErr } = useDLSContext();
-
-  async function onChangeFile(e: ChangeEvent) {
-    const file = (e.target as HTMLInputElement).files[0];
-
-    if (!file) return alert("No files selected");
-
-    try {
-      setuploadingImageStatus(true);
-      const result = await client.add(file);
-      const url = DOMAIN_URL + result.path;
-      setuploadingImageStatus(false);
-      setFileUrl(url);
-    } catch (e) {
-      setuploadingImageStatus(false);
-      console.log(e);
-    }
-  }
-
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async () => {
-    for (let key in formState) {
-      if (key !== "prev_owner_cnic" && formState[key] === "") return;
-    }
-    if (fileUrl === "") return;
-    const data = JSON.stringify({ ...formState, certificate: fileUrl });
-    setSubmissionStatus(true);
-    try {
-      const added = await client.add(data);
-
-      //use added.path as ipfsHash
-
-      //For console testing
-      const url = DOMAIN_URL + added.path;
-      console.log(url);
-
-      await addNewLandRecord(added.path);
-
-      setSubmissionStatus(false);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const onChangeDate = (date: Date) => {
-    setFormState({ ...formState, land_purchase_date: date });
-  };
-
-  return (
-    <Card>
-      <CardHeader
-        title="Add New Land"
-        titleTypographyProps={{ variant: "h6" }}
-      />
-
-      <Divider />
-      <CardContent>
-        <AddNewLand
-          formState={{ ...formState, certificate: "" }}
-          onChangeDate={onChangeDate}
-          onChange={onChange}
-          onChangeFile={onChangeFile}
-          uploadingImageStatus={uploadingImageStatus}
-        />
-      </CardContent>
-
-      <CardActions>
-        <LoadingButton
-          onClick={handleSubmit}
-          size="large"
-          type="submit"
-          sx={{ mr: 2 }}
-          variant="contained"
-          loading={uploadingImageStatus || submissionStatus}
-        >
-          Submit
-        </LoadingButton>
-        <Typography mt={2} fontSize={12}>
-          It will take approx 2-3 mins, so please wait after pressing the
-          button.
-        </Typography>
-      </CardActions>
-      {contractErr && <Alert color="error">{contractErr}</Alert>}
-    </Card>
-  );
+const NewLandWrapper = () => {
+  return <LandRecordForm />;
 };
 
-export default withAuth(NewLand);
+export default withAuth(NewLandWrapper);

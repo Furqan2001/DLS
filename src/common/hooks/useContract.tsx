@@ -4,7 +4,13 @@ import { DLSAddress } from "../constants/contractAddress";
 import Web3Modal from "web3modal";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { LOCAL_STORAGE_KEYS, ROLES, URLS } from "../../@core/globals/enums";
+import {
+  GET_ALL_LAND_RECORD_STATUS,
+  LAND_RECORD_STATUS,
+  LOCAL_STORAGE_KEYS,
+  ROLES,
+  URLS,
+} from "../../@core/globals/enums";
 import { saveData } from "../../@core/helpers/localStorage";
 import { ILandRecord } from "../../@core/globals/types";
 import {
@@ -170,23 +176,38 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
     [!!contract]
   );
 
-  const getAllLandRecords = useCallback(async () => {
-    if (!contract) return;
-    setLoading(true);
-    try {
-      const landsRecords = await contract.fetchAllProperties();
-      const lands = landsRecords?.map((land) => ({
-        ipfsHash: land.ipfsHash,
-        itemId: convertBigHexNumberToNumber(land.itemId),
-        status: getLandRecordStatus(land.status),
-      })) as ILandRecord[];
+  const getAllLandRecords = useCallback(
+    async (type: GET_ALL_LAND_RECORD_STATUS) => {
+      if (!contract) return;
+      setLoading(true);
+      let landsRecords;
+      try {
+        if (type === "all") {
+          landsRecords = await contract.fetchAllProperties();
+        } else if (type === GET_ALL_LAND_RECORD_STATUS.approved) {
+          landsRecords = await contract.fetchAllApprovedProperties();
+        } else if (type === GET_ALL_LAND_RECORD_STATUS.rejected) {
+          landsRecords = await contract.fetchAllRejectedProperties();
+        } else if (type === GET_ALL_LAND_RECORD_STATUS.pending) {
+          landsRecords = await contract.fetchAllPendingProperties();
+        } else if (type === GET_ALL_LAND_RECORD_STATUS.underChangeReview) {
+          landsRecords = await contract.fetchAllUnderReviewProperties();
+        }
 
-      return lands;
-    } catch (err) {
-      console.log("err in making the moderator ", contract, err);
-    }
-    setLoading(false);
-  }, [!!contract]);
+        const lands = landsRecords?.map((land) => ({
+          ipfsHash: land.ipfsHash,
+          itemId: convertBigHexNumberToNumber(land.itemId),
+          status: getLandRecordStatus(land.status),
+        })) as ILandRecord[];
+
+        return lands;
+      } catch (err) {
+        console.log("err in making the moderator ", contract, err);
+      }
+      setLoading(false);
+    },
+    [!!contract]
+  );
 
   const approveProperty = useCallback(
     async (itemId: number) => {
@@ -242,6 +263,23 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
     [!!contract]
   );
 
+  const transferLandOwnership = useCallback(
+    async (itemId: string, ipfsHash: string) => {
+      if (!contract) return;
+      setLoading(true);
+      try {
+        await contract.changeOwnership(BigNumber.from(itemId), ipfsHash);
+      } catch (err) {
+        console.log("err in transfering the ownership ", contract, err);
+        setContractErr(String(err?.error?.message));
+      }
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000);
+    },
+    [!!contract]
+  );
+
   return {
     fetchContractDetails,
     loginUser,
@@ -259,6 +297,7 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
     approveProperty,
     rejectProperty,
     fetchSinglePropertyInfo,
+    transferLandOwnership,
   };
 };
 

@@ -8,7 +8,7 @@ import AccountCogOutline from "mdi-material-ui/AccountCogOutline";
 import CreditCardOutline from "mdi-material-ui/CreditCardOutline";
 import AccountPlusOutline from "mdi-material-ui/AccountPlusOutline";
 import AlertCircleOutline from "mdi-material-ui/AlertCircleOutline";
-import GoogleCirclesExtended from "mdi-material-ui/GoogleCirclesExtended";
+import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
 import AddModeratorOutlinedIcon from "@mui/icons-material/AddModeratorOutlined";
 import SupervisorAccountOutlinedIcon from "@mui/icons-material/SupervisorAccountOutlined";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
@@ -50,6 +50,11 @@ const navigation = (): VerticalNavItemsType => {
       title: "Add Land",
       icon: AddLocationAltIcon,
       path: "/dashboard/new-land",
+    },
+    {
+      title: "Transfer land ownership",
+      icon: ForwardToInboxIcon,
+      path: "/dashboard/new-ownership",
     },
     // {
     //   title: "Cards",

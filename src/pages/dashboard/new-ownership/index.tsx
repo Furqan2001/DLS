@@ -1,3 +1,4 @@
+import { ChangeEvent, useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import {
   Box,
@@ -11,26 +12,23 @@ import {
 } from "@mui/material";
 import Link from "@mui/material/Link";
 import ModeratorTable from "../../../views/Users/Table";
-import { useEffect, useState } from "react";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import withAuth from "../../../@core/HOC/withAuth";
 import { ILandRecord } from "../../../@core/globals/types";
 import LandTable from "../../../views/Lands/Table";
-import {
-  GET_ALL_LAND_RECORD_STATUS,
-  LAND_RECORD_STATUS,
-  URLS,
-} from "../../../@core/globals/enums";
+import { GET_ALL_LAND_RECORD_STATUS, URLS } from "../../../@core/globals/enums";
+import { DOMAIN_URL, client } from "../../../@core/helpers/ipfs";
 
-const Lands = () => {
-  const [filterUsersList, setFilterUsersList] =
-    useState<GET_ALL_LAND_RECORD_STATUS>(GET_ALL_LAND_RECORD_STATUS.all);
+const NewOwnership = () => {
+  const [filterUsersList, setFilterUsersList] = useState("all");
   const { getAllLandRecords } = useDLSContext();
   const [landRecords, setLandRecords] = useState<ILandRecord[]>([]);
 
   useEffect(() => {
     (async () => {
-      const res = (await getAllLandRecords(filterUsersList)) as ILandRecord[];
+      const res = (await getAllLandRecords(
+        GET_ALL_LAND_RECORD_STATUS.approved
+      )) as ILandRecord[];
 
       setLandRecords(res);
     })();
@@ -41,7 +39,7 @@ const Lands = () => {
       <Grid item xs={12}>
         <Typography variant="h5">
           <Link href="https://mui.com/components/tables/" target="_blank">
-            Lands
+            Lands Records
           </Link>
         </Typography>
         <Typography variant="body2">List of all land records</Typography>
@@ -66,11 +64,7 @@ const Lands = () => {
                       id="form-layouts-separator-select"
                       labelId="form-layouts-separator-select-label"
                       value={filterUsersList}
-                      onChange={(e) =>
-                        setFilterUsersList(
-                          e.target.value as GET_ALL_LAND_RECORD_STATUS
-                        )
-                      }
+                      onChange={(e) => setFilterUsersList(e.target.value)}
                     >
                       <MenuItem value="all">All</MenuItem>
                       <MenuItem value="approved">Approved</MenuItem>
@@ -83,11 +77,11 @@ const Lands = () => {
             }
             titleTypographyProps={{ variant: "h6" }}
           />
-          <LandTable data={landRecords} redirectUrl={URLS.allLands} />
+          <LandTable data={landRecords} redirectUrl={URLS.newOwnerships} />
         </Card>
       </Grid>
     </Grid>
   );
 };
 
-export default withAuth(Lands);
+export default withAuth(NewOwnership);

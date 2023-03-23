@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dbConnect from "../../common/libs/dbConnect";
-import User, { IDefaultReturnedType } from "../../common/modals/User";
+import User, { IDefaultReturnedType } from "../../common/models/User";
 import AWS from "aws-sdk";
 import multiparty from "multiparty";
 import fs from "fs";

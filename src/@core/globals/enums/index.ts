@@ -3,7 +3,8 @@ export enum URLS {
   usersDetail = "/dashboard/users",
   profile = "/dashboard/account-settings",
   login = "/",
-  allLands = "/dashboard/lands"
+  allLands = "/dashboard/lands",
+  newOwnerships = "/dashboard/new-ownership"
 }
 
 export enum ROLES {
@@ -21,4 +22,13 @@ export enum LAND_RECORD_STATUS {
   underChangeReview = "underChangeReview",
   approved = "approved",
   rejected = "rejected",
+}
+
+// it is used to fetch land record according to different status types
+export enum GET_ALL_LAND_RECORD_STATUS {
+  pending = "pending",
+  underChangeReview = "underChangeReview",
+  approved = "approved",
+  rejected = "rejected",
+  all = "all",
 }

@@ -51,9 +51,10 @@ const roleColorObj: IGenericColor = {
 interface IProps {
   tableRole?: "admin" | "moderator";
   data?: ILandRecord[];
+  redirectUrl: string;
 }
 
-const LandTable = ({ tableRole, data = [] }: IProps) => {
+const LandTable = ({ tableRole, data = [], redirectUrl }: IProps) => {
   // ** States
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -69,7 +70,7 @@ const LandTable = ({ tableRole, data = [] }: IProps) => {
   };
 
   const openLandRecord = (ipfsHash: string, itemId: number) => {
-    router.push(`${URLS.allLands}/${ipfsHash}?itemId=${itemId}`);
+    router.push(`${redirectUrl}/${ipfsHash}?itemId=${itemId}`);
   };
 
   return (
