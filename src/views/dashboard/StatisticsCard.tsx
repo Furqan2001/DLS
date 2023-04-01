@@ -24,7 +24,7 @@ import { ThemeColor } from "src/@core/layouts/types";
 interface IProps {
   mainTitle: string;
   description: string;
-  stats: string;
+  stats: number;
   title: string;
   color?: ThemeColor;
   icon: ReactElement;

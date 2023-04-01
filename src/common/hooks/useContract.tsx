@@ -90,24 +90,27 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
     }
   };
 
-  const fetchAllUsers = async (
-    type: ROLES.admin | ROLES.moderator | "users" = "users"
-  ) => {
-    let users = [];
+  const fetchAllUsers = useCallback(
+    async (type: ROLES.admin | ROLES.moderator | "users" = "users") => {
+      if (!contract) return;
+      let users = [];
 
-    try {
-      if (type === "users") {
-        users = await contract.fetchAllUsers();
-      } else if (type === ROLES.admin) {
-        users = await contract.fetchAllAdmins();
-      } else if (type === ROLES.moderator) {
-        users = await contract.fetchAllModerators();
+      try {
+        if (type === "users") {
+          users = await contract.fetchAllUsers();
+        } else if (type === ROLES.admin) {
+          users = await contract.fetchAllAdmins();
+        } else if (type === ROLES.moderator) {
+          users = await contract.fetchAllModerators();
+        }
+      } catch (err) {
+        console.log("err in fetching all the users ", contract, err);
       }
-    } catch (err) {
-      console.log("err in fetching all the users ", contract, err);
-    }
-    return users;
-  };
+
+      return users;
+    },
+    [contract]
+  );
 
   const fetchSpecificUser = useCallback(
     async (userAddress: string) => {
