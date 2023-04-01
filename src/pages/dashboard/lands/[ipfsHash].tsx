@@ -45,7 +45,7 @@ import {
   IIPFSRecord,
   ILandRecord,
 } from "../../../@core/globals/types";
-import { ROLES, URLS } from "../../../@core/globals/enums";
+import { LAND_RECORD_STATUS, ROLES, URLS } from "../../../@core/globals/enums";
 import LoadingButton from "../../../@core/components/shared/LoadingButton";
 import { useUserInfo } from "../../../common/context/UserInfoContext";
 import withAuth from "../../../@core/HOC/withAuth";
@@ -58,6 +58,7 @@ import LandDetails from "../../../views/Lands/LandDetails";
 import { getLandRecordStatus, isEmptyObject } from "../../../@core/helpers";
 import LandStatusActionButton from "../../../views/Lands/LandStatusActionButton";
 import CustomModal from "../../../@core/components/shared/CustomModal";
+import { sendMail } from "../../../common/api/sendMail";
 
 const LandDetail = () => {
   const router = useRouter();
@@ -83,6 +84,7 @@ const LandDetail = () => {
     (async () => {
       try {
         const res = await getValueFromHash<IIPFSRecord>(ipfsHash as string);
+
         console.log("res is ", res);
 
         setFormState({
@@ -111,23 +113,52 @@ const LandDetail = () => {
     })();
   }, [fetchSinglePropertyInfo, itemId]);
 
-  const handleAction = async (type: "approve" | "reject") => {
+  const handleAction = async (type: "approve" | "reject" | "previousOwner") => {
     if (type === "approve") {
-      await approveProperty(Number(itemId));
-      router.push(URLS.allLands);
+      await approveProperty(
+        Number(itemId),
+        landRecord.status === LAND_RECORD_STATUS.underChangeReview
+      );
     } else if (type === "reject") {
       setShowRejectionBox(true);
+    } else if (type === "previousOwner" && formState.previous_onwers_hashes) {
+      const previousOnwerHash =
+        formState.previous_onwers_hashes[
+          formState.previous_onwers_hashes.length - 1
+        ];
+      router.push(`${URLS.allLands}/${previousOnwerHash}`);
     }
+  };
+
+  const rejectPropertyWrapper = async () => {
+    try {
+      await rejectProperty(
+        Number(itemId),
+        rejectionBoxMsg,
+        landRecord.status === LAND_RECORD_STATUS.underChangeReview
+      );
+    } catch (err) {}
+  };
+
+  const sendRejectPropertyEmail = async () => {
+    try {
+      await sendMail({
+        subject: "Property rejected",
+        message: `Your property has been rejected with the following message ${rejectionBoxMsg}`,
+        to: formState.owner_email,
+      });
+    } catch (err) {}
   };
 
   const handleReject = async () => {
     if (!rejectionBoxMsg) return;
 
-    await rejectProperty(Number(itemId), rejectionBoxMsg);
+    await Promise.all([rejectPropertyWrapper(), sendRejectPropertyEmail()]);
     if (!contractErr) router.push(URLS.allLands);
   };
 
   const isAdmin = userRole === ROLES.admin;
+
   return (
     <>
       <Card>
@@ -153,6 +184,8 @@ const LandDetail = () => {
                 contractActionLoading={contractActionLoading}
                 handleAction={handleAction}
                 landStatus={landRecord?.status}
+                itemId={itemId as string}
+                showOwnlyPreviousHistoryBtn={!!formState.previous_onwers_hashes}
               />
               <a
                 target="_blank"

@@ -210,11 +210,12 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
   );
 
   const approveProperty = useCallback(
-    async (itemId: number) => {
+    async (itemId: number, ownershipChangeReq: boolean = false) => {
       if (!contract) return;
       trackApiUtility();
       try {
-        await contract.approveProperty(itemId);
+        if (!ownershipChangeReq) await contract.approveProperty(itemId);
+        else await contract.approveOwnershipChange(itemId);
       } catch (err) {
         console.log("err in making the moderator ", contract);
         setContractErr(String(err?.error?.message));
@@ -227,11 +228,16 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
   );
 
   const rejectProperty = useCallback(
-    async (itemId: number, msg: string) => {
+    async (
+      itemId: number,
+      msg: string,
+      ownershipChangeReq: boolean = false
+    ) => {
       if (!contract) return;
       trackApiUtility();
       try {
-        await contract.rejectProperty(itemId, msg);
+        if (!ownershipChangeReq) await contract.rejectProperty(itemId, msg);
+        else await contract.rejectOwnershipChange(itemId, msg);
       } catch (err) {
         console.log("err in rejecting the property ", contract, err);
         setContractErr(String(err?.error?.message));

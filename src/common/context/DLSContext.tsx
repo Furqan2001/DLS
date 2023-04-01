@@ -22,8 +22,12 @@ const initialValue = {
   addNewLandRecord: async (ipfsHash: string) => {},
   refreshLogin: async (address: string, skipCurrentLogin: boolean) => {},
   getAllLandRecords: async (type: GET_ALL_LAND_RECORD_STATUS) => [],
-  approveProperty: async (itemId: number) => {},
-  rejectProperty: async (itemId: number, msg: string) => {},
+  approveProperty: async (itemId: number, ownershipChangeReq = false) => {},
+  rejectProperty: async (
+    itemId: number,
+    msg: string,
+    ownershipChangeReq = false
+  ) => {},
   fetchSinglePropertyInfo: async (itemId: string) => ({}),
   transferLandOwnership: async (itemId: string, ipfsHash: string) => {},
   userAddress: "",

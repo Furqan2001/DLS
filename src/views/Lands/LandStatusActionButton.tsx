@@ -3,13 +3,15 @@ import LoadingButton from "../../@core/components/shared/LoadingButton";
 import { LAND_RECORD_STATUS } from "../../@core/globals/enums";
 import { useMemo } from "react";
 
-type ThandleActionKey = "approve" | "reject";
+type ThandleActionKey = "approve" | "reject" | "previousOwner";
 type TColors = "primary" | "secondary" | "error";
 
 interface IProps {
   contractActionLoading: boolean;
   handleAction: (key: ThandleActionKey) => {};
   landStatus?: LAND_RECORD_STATUS;
+  itemId?: string;
+  showOwnlyPreviousHistoryBtn?: boolean;
 }
 
 const allButtons = [
@@ -23,26 +25,35 @@ const allButtons = [
     text: "Reject",
     color: "error" as TColors,
   },
+  {
+    type: "previousOwner" as ThandleActionKey,
+    text: "Previous Owner Info",
+    color: "info" as TColors,
+  },
 ];
 
 const LandStatusActionButton = ({
   contractActionLoading,
   handleAction,
   landStatus,
+  itemId,
+  showOwnlyPreviousHistoryBtn,
 }: IProps) => {
   // buttons will show according to the status of the land records
   const buttonsList = useMemo(() => {
-    if (
+    if (landStatus === LAND_RECORD_STATUS.underChangeReview) {
+      if (!itemId) return [allButtons[2]];
+
+      return allButtons;
+    } else if (
       landStatus === LAND_RECORD_STATUS.approved ||
       landStatus === LAND_RECORD_STATUS.rejected
     ) {
+      if (showOwnlyPreviousHistoryBtn) return [allButtons[2]];
       return []; // no button will be show
-    } else if (
-      landStatus === LAND_RECORD_STATUS.pending ||
-      landStatus === LAND_RECORD_STATUS.underChangeReview
-    )
-      return allButtons;
-  }, [landStatus]);
+    } else if (landStatus === LAND_RECORD_STATUS.pending)
+      return allButtons.slice(0, 2);
+  }, [landStatus, itemId, showOwnlyPreviousHistoryBtn]);
 
   return (
     <>

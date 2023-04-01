@@ -378,7 +378,7 @@ contract DLS {
             idToPropertyItem[_itemId].status == Status.UnderChangeReview,
             "No ownership request for the designated property exists"
         );
-        idToPropertyItem[_itemId].status = Status.Approved;
+        idToPropertyItem[_itemId].status = Status.Rejected;
         idToPropertyItem[_itemId].ipfsHash = ownershipChangeItems[_itemId]
             .ipfsHash;
         idToPropertyItem[_itemId].updatedBy = address(0);
