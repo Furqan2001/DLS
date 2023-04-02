@@ -137,15 +137,15 @@ const LandDetail = () => {
 
   return (
     <Box>
-      {/* {shouldShowEmailVerificationBox && (
+      {shouldShowEmailVerificationBox && (
         <EmailVerification
           setShowLandRecord={() => {
             setShowEmailVerificationBox(false);
           }}
           email={formState.owner_email}
         />
-      )} */}
-      {formState && (
+      )}
+      {shouleShowLandRecord && (
         <LandRecordForm
           form="transferLandOwnership"
           ipfsHash={ipfsHash as string}

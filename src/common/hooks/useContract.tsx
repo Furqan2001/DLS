@@ -86,7 +86,12 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
 
     if (!skipRouting) {
       saveData(LOCAL_STORAGE_KEYS.accountAddress, currentAccountAddress);
-      router.push(URLS.dashboard);
+
+      if (role === ROLES.admin) {
+        router.push(URLS.dashboard);
+      } else {
+        router.push(URLS.profile);
+      }
     }
   };
 

@@ -16,61 +16,61 @@ import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
 
 // ** Type import
 import { VerticalNavItemsType } from "src/@core/layouts/types";
+import { ROLES } from "../../@core/globals/enums";
 
 const navigation = (): VerticalNavItemsType => {
   return [
     {
       title: "Dashboard",
+      //@ts-ignore
       icon: HomeOutline,
       path: "/dashboard",
+      role: ROLES.admin,
     },
     {
       title: "Account Settings",
+      //@ts-ignore
       icon: AccountCogOutline,
       path: "/dashboard/account-settings",
+      role: [ROLES.admin, ROLES.visitor, ROLES.moderator],
     },
     {
       sectionTitle: "Users",
+      role: ROLES.admin,
     },
     {
       title: "Users",
+      //@ts-ignore
       icon: AddModeratorOutlinedIcon,
       path: "/dashboard/users",
       openInNewTab: true,
+      role: ROLES.admin,
     },
     {
       sectionTitle: "Lands",
+      role: [ROLES.admin, ROLES.moderator],
     },
     {
       title: "Lands",
+      //@ts-ignore
       icon: LocationCityIcon,
       path: "/dashboard/lands",
+      role: ROLES.admin,
     },
     {
       title: "Add Land",
+      //@ts-ignore
       icon: AddLocationAltIcon,
       path: "/dashboard/new-land",
+      role: ROLES.moderator,
     },
     {
       title: "Transfer land ownership",
+      //@ts-ignore
       icon: ForwardToInboxIcon,
       path: "/dashboard/new-ownership",
+      role: ROLES.moderator,
     },
-    // {
-    //   title: "Cards",
-    //   icon: CreditCardOutline,
-    //   path: "/dashboard/cards",
-    // },
-    // {
-    //   title: "Tables",
-    //   icon: Table,
-    //   path: "/dashboard/tables",
-    // },
-    // {
-    //   icon: CubeOutline,
-    //   title: "Form Layouts",
-    //   path: "/dashboard/form-layouts",
-    // },
   ];
 };
 

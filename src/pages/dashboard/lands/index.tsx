@@ -19,6 +19,7 @@ import LandTable from "../../../views/Lands/Table";
 import {
   GET_ALL_LAND_RECORD_STATUS,
   LAND_RECORD_STATUS,
+  ROLES,
   URLS,
 } from "../../../@core/globals/enums";
 import LandDetailWrapper from "../../../views/Lands/LandDetailWrapper";
@@ -27,4 +28,4 @@ const Lands = () => {
   return <LandDetailWrapper />;
 };
 
-export default withAuth(Lands);
+export default withAuth(Lands, ROLES.admin);

@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { getData } from "../helpers/localStorage";
-import { LOCAL_STORAGE_KEYS, URLS } from "../globals/enums";
+import { LOCAL_STORAGE_KEYS, ROLES, URLS } from "../globals/enums";
 import { useDLSContext } from "../../common/context/DLSContext";
 import { useRouter } from "next/router";
+import Error401 from "../../pages/401";
 
-const withAuth = (Component) => {
-  const AuthenticatedComponent = () => {
+const withAuth = (Component, role: ROLES | "all" = "all") => {
+  const AuthenticatedComponent = (props: any = {}) => {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    const { refreshLogin, contract } = useDLSContext();
+    const { refreshLogin, contract, userRole } = useDLSContext();
 
     useEffect(() => {
       (async () => {
@@ -24,8 +25,9 @@ const withAuth = (Component) => {
     }, [contract]);
 
     if (loading) return <div>Please wait ...</div>;
+    if (role !== "all" && userRole !== role) return <Error401 />;
 
-    return <Component />;
+    return <Component {...props} />;
   };
 
   return AuthenticatedComponent;

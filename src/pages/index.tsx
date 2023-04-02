@@ -35,6 +35,7 @@ import FooterIllustrationsV1 from "src/views/pages/auth/FooterIllustration";
 import { useDLSContext } from "../common/context/DLSContext";
 import { URLS } from "../@core/globals/enums";
 import LoadingButton from "../@core/components/shared/LoadingButton";
+import Logo from "../@core/components/shared/svgs/Logo";
 
 interface State {
   password: string;
@@ -80,6 +81,7 @@ const LoginPage = () => {
               justifyContent: "center",
             }}
           >
+            <Logo />
             <Typography
               variant="h6"
               sx={{
@@ -101,7 +103,8 @@ const LoginPage = () => {
               Welcome to {themeConfig.templateName}! 👋🏻
             </Typography>
             <Typography variant="body2">
-              Please sign-in to your account and start the adventure
+              Please sign-in to your account and start the property management
+              system
             </Typography>
           </Box>
 

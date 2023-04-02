@@ -72,9 +72,8 @@ const App = (props: ExtendedAppProps) => {
     return <></>;
   }
 
-  // Variables
-  const getLayout =
-    Component.getLayout ?? ((page) => <UserLayout>{page}</UserLayout>);
+  //@ts-ignore
+  const getLayout =  Component.getLayout ?? ((page) => <UserLayout>{page}</UserLayout>);
 
   return (
     <CacheProvider value={emotionCache}>

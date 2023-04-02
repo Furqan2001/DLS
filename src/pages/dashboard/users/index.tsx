@@ -97,4 +97,4 @@ const Users = () => {
   );
 };
 
-export default withAuth(Users);
+export default withAuth(Users, ROLES.admin);

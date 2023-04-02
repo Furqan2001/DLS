@@ -42,6 +42,7 @@ import { useDLSContext } from "../../../common/context/DLSContext";
 import withAuth from "../../../@core/HOC/withAuth";
 import LandDetails from "../../../views/Lands/LandDetails";
 import LandRecordForm from "../../../views/NewLand/LandRecordForm";
+import { ROLES } from "../../../@core/globals/enums";
 
 interface State {
   password: string;
@@ -72,4 +73,4 @@ const NewLandWrapper = () => {
   return <LandRecordForm />;
 };
 
-export default withAuth(NewLandWrapper);
+export default withAuth(NewLandWrapper, ROLES.moderator);
