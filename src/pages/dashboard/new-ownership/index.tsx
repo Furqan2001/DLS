@@ -38,7 +38,7 @@ const NewOwnership = () => {
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Typography variant="h5">
-          <Link href="https://mui.com/components/tables/" target="_blank">
+          <Link href="#">
             Lands Records
           </Link>
         </Typography>
@@ -49,8 +49,8 @@ const NewOwnership = () => {
         <Card>
           <CardHeader
             title={
-              <Grid container alignItems="center" spacing={5} sx={{ ml: 5 }}>
-                <Typography variant="h5" sx={{ mt: 5 }}>
+              <Grid container alignItems="center" spacing={4} sx={{ ml: 0 }}>
+                <Typography variant="h6" sx={{ mt: 5 }}>
                   Filters
                 </Typography>
                 <Grid item xs={4}>

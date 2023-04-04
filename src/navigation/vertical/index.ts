@@ -28,13 +28,6 @@ const navigation = (): VerticalNavItemsType => {
       role: ROLES.admin,
     },
     {
-      title: "Account Settings",
-      //@ts-ignore
-      icon: AccountCogOutline,
-      path: "/dashboard/account-settings",
-      role: [ROLES.admin, ROLES.visitor, ROLES.moderator],
-    },
-    {
       sectionTitle: "Users",
       role: ROLES.admin,
     },
@@ -55,7 +48,7 @@ const navigation = (): VerticalNavItemsType => {
       //@ts-ignore
       icon: LocationCityIcon,
       path: "/dashboard/lands",
-      role: ROLES.admin,
+      role: [ROLES.admin, ROLES.visitor, ROLES.moderator],
     },
     {
       title: "Add Land",
@@ -70,6 +63,17 @@ const navigation = (): VerticalNavItemsType => {
       icon: ForwardToInboxIcon,
       path: "/dashboard/new-ownership",
       role: ROLES.moderator,
+    },
+    {
+      sectionTitle: "Account Settings",
+      role: [ROLES.admin, ROLES.moderator, ROLES.visitor],
+    },
+    {
+      title: "Account Settings",
+      //@ts-ignore
+      icon: AccountCogOutline,
+      path: "/dashboard/account-settings",
+      role: [ROLES.admin, ROLES.visitor, ROLES.moderator],
     },
   ];
 };

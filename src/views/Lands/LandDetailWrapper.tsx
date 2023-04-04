@@ -46,9 +46,9 @@ const LandDetailWrapper = ({ allLandRecords, hideFilter }: IProps) => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={12}>
+      <Grid item xs={12} sx= {{ml: 1}}>
         <Typography variant="h5">
-          <Link href="https://mui.com/components/tables/" target="_blank">
+          <Link href="#">
             Lands
           </Link>
         </Typography>
@@ -65,9 +65,9 @@ const LandDetailWrapper = ({ allLandRecords, hideFilter }: IProps) => {
                     container
                     alignItems="center"
                     spacing={5}
-                    sx={{ ml: 5 }}
+                    sx={{ ml: 0 }}
                   >
-                    <Typography variant="h5" sx={{ mt: 5 }}>
+                    <Typography variant="h6" sx={{ mt: 5 }}>
                       Filters
                     </Typography>
                     <Grid item xs={4}>

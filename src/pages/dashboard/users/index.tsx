@@ -61,8 +61,8 @@ const Users = () => {
         <Card>
           <CardHeader
             title={
-              <Grid container alignItems="center" spacing={5} sx={{ ml: 5 }}>
-                <Typography variant="h5" sx={{ mt: 5 }}>
+              <Grid container alignItems="center" spacing={5} sx={{ ml: 0 }}>
+                <Typography variant="h6" sx={{ mt: 5 }}>
                   Filters
                 </Typography>
                 <Grid item xs={4}>

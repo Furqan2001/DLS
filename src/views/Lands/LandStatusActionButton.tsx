@@ -11,6 +11,7 @@ interface IProps {
   handleAction: (key: ThandleActionKey) => {};
   landStatus?: LAND_RECORD_STATUS;
   itemId?: string;
+  isAdmin: boolean;
   showOwnlyPreviousHistoryBtn?: boolean;
 }
 
@@ -37,6 +38,7 @@ const LandStatusActionButton = ({
   handleAction,
   landStatus,
   itemId,
+  isAdmin,
   showOwnlyPreviousHistoryBtn,
 }: IProps) => {
   // buttons will show according to the status of the land records
@@ -51,9 +53,9 @@ const LandStatusActionButton = ({
     ) {
       if (showOwnlyPreviousHistoryBtn) return [allButtons[2]];
       return []; // no button will be show
-    } else if (landStatus === LAND_RECORD_STATUS.pending)
+    } else if (landStatus === LAND_RECORD_STATUS.pending && isAdmin)
       return allButtons.slice(0, 2);
-  }, [landStatus, itemId, showOwnlyPreviousHistoryBtn]);
+  }, [landStatus, itemId, showOwnlyPreviousHistoryBtn, isAdmin]);
 
   return (
     <>

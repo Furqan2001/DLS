@@ -28,4 +28,4 @@ const Lands = () => {
   return <LandDetailWrapper />;
 };
 
-export default withAuth(Lands, ROLES.admin);
+export default withAuth(Lands);
