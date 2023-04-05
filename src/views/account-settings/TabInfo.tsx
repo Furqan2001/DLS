@@ -27,6 +27,7 @@ import { useDLSContext } from "../../common/context/DLSContext";
 import { fetchUserInfo, updateUserBioInfo } from "../../common/api/userInfo";
 import { IDbUserInfo } from "../../@core/globals/types";
 import LoadingButton from "../../@core/components/shared/LoadingButton";
+import { useUserInfo } from "../../common/context/UserInfoContext";
 
 // eslint-disable-next-line react/display-name
 const CustomInput = forwardRef((props, ref) => {
@@ -47,6 +48,7 @@ const TabInfo = ({ userInfo }: IProps) => {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const { userAddress } = useDLSContext();
+  const { fetchCurrentUserDetail } = useUserInfo();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormState({ ...formState, [e.target.name]: e.target.value });
@@ -68,6 +70,7 @@ const TabInfo = ({ userInfo }: IProps) => {
 
     try {
       await updateUserBioInfo(formData);
+      await fetchCurrentUserDetail();
     } catch (err) {
       console.log("err is ", err);
       setErr(err?.message);

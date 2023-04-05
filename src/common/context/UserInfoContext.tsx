@@ -18,6 +18,7 @@ interface IUserInfoContext {
   userAddress: string;
   userRole: ROLES;
   fetchUserDbDetails: (defaultUserAddress: string) => Promise<IDbUserInfo>;
+  fetchCurrentUserDetail: () => Promise<void>;
 }
 
 const initialValue: IUserInfoContext = {
@@ -34,6 +35,7 @@ const initialValue: IUserInfoContext = {
     username: "",
     email: "",
   }),
+  fetchCurrentUserDetail: async () => {},
 };
 
 const UserInfoContext = createContext<IUserInfoContext>(initialValue);
@@ -79,6 +81,7 @@ const UserInfoContextProvider = ({
       value={{
         userInfo,
         fetchUserDbDetails,
+        fetchCurrentUserDetail,
         loadingUserInfo: loading,
         userAddress,
         userRole,

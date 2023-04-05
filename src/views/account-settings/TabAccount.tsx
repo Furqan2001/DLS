@@ -33,6 +33,7 @@ import { useDLSContext } from "../../common/context/DLSContext";
 import { findUndefinedKeyInObj } from "../../@core/helpers";
 import LoadingButton from "../../@core/components/shared/LoadingButton";
 import { IDbUserInfo } from "../../@core/globals/types";
+import { useUserInfo } from "../../common/context/UserInfoContext";
 
 const ImgStyled = styled("img")(({ theme }) => ({
   width: 120,
@@ -72,6 +73,8 @@ const TabAccount = ({ userInfo }: IProps) => {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const { userRole, userAddress } = useDLSContext();
+
+  const { fetchCurrentUserDetail } = useUserInfo();
 
   const [formState, setFormState] = useState({
     username: "",
@@ -127,6 +130,7 @@ const TabAccount = ({ userInfo }: IProps) => {
 
     try {
       await updateUserInfo(formData);
+      await fetchCurrentUserDetail();
     } catch (err) {
       console.log("err in updating the user info ", err);
       setErr(err?.message);
