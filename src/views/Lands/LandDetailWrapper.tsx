@@ -37,20 +37,19 @@ const LandDetailWrapper = ({ allLandRecords, hideFilter }: IProps) => {
     if (allLandRecords) return setLandRecords(allLandRecords);
 
     (async () => {
-      console.log("landRecords ", filterUsersList);
-      const res = (await getAllLandRecords(filterUsersList)) as ILandRecord[];
+      const res = (await getAllLandRecords(
+        hideFilter ? GET_ALL_LAND_RECORD_STATUS.approved : filterUsersList
+      )) as ILandRecord[];
 
       setLandRecords(res);
     })();
-  }, [allLandRecords, getAllLandRecords, filterUsersList]);
+  }, [allLandRecords, getAllLandRecords, filterUsersList, hideFilter]);
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={12} sx= {{ml: 1}}>
+      <Grid item xs={12} sx={{ ml: 1 }}>
         <Typography variant="h5">
-          <Link href="#">
-            Lands
-          </Link>
+          <Link href="#">Lands</Link>
         </Typography>
         <Typography variant="body2">List of all land records</Typography>
       </Grid>

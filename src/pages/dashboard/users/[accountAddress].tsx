@@ -36,12 +36,20 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
+import styled from "@emotion/styled";
 import { useDLSContext } from "../../../common/context/DLSContext";
 import { IBlockchainUserInfo, IDbUserInfo } from "../../../@core/globals/types";
 import { ROLES } from "../../../@core/globals/enums";
 import LoadingButton from "../../../@core/components/shared/LoadingButton";
 import { useUserInfo } from "../../../common/context/UserInfoContext";
 import withAuth from "../../../@core/HOC/withAuth";
+
+const DisabledTextField = styled(TextField)({
+  '& .Mui-disabled': {
+    '-webkit-text-fill-color': '#000 !important',
+  },
+});
+
 
 const UserAccountInfo = () => {
   // ** States
@@ -94,7 +102,7 @@ const UserAccountInfo = () => {
 
   return (
     <Card>
-      <CardHeader title="Admin Info" titleTypographyProps={{ variant: "h6" }} />
+      <CardHeader title="User Info" titleTypographyProps={{ variant: "h6" }} />
       <CardContent>
         {!dbUserInfo && (
           <Box>
@@ -110,50 +118,56 @@ const UserAccountInfo = () => {
             <Grid container spacing={5}>
               <Grid item container xs={12} spacing={5}>
                 <Grid item xs={12} sm={6}>
-                  <TextField
+                  <DisabledTextField
                     fullWidth
                     label="Username"
                     value={dbUserInfo.username}
                     name="username"
+                    disabled
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
+                  <DisabledTextField
                     fullWidth
                     label="Name"
                     value={dbUserInfo.name}
                     name="name"
+                    disabled
                   />
                 </Grid>
               </Grid>
               <Grid item container xs={12} spacing={5}>
                 <Grid item xs={12} sm={6}>
-                  <TextField
+                  <DisabledTextField
                     fullWidth
                     label="Email"
                     value={dbUserInfo.email}
                     name="email"
+                    disabled
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
+                  <DisabledTextField
                     fullWidth
+                    label="Phone"
                     value={dbUserInfo.phoneNumber}
                     name="phone"
+                    disabled
                   />
                 </Grid>
               </Grid>
               <Grid item container xs={12} spacing={5}>
                 <Grid item xs={12} sm={6}>
-                  <TextField
+                  <DisabledTextField
                     fullWidth
                     label="Cnic"
                     value={dbUserInfo.cnic}
                     name="cnic"
+                    disabled
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <FormControl>
+                  <FormControl disabled>
                     <FormLabel sx={{ fontSize: "0.875rem" }}>Gender</FormLabel>
                     <RadioGroup
                       row

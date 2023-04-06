@@ -58,7 +58,7 @@ const navigation = (): VerticalNavItemsType => {
       role: ROLES.moderator,
     },
     {
-      title: "Transfer land ownership",
+      title: "Transfer ownership",
       //@ts-ignore
       icon: ForwardToInboxIcon,
       path: "/dashboard/new-ownership",

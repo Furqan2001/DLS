@@ -13,6 +13,7 @@ interface IUser {
   avatar?: string;
   accountAddress: string;
   username: string;
+  cnic: string;
   bio?: string;
   phoneNumber?: string;
   birthDate?: Date;
@@ -29,6 +30,7 @@ const userSchema = new Schema<IUser>({
   name: { type: String },
   email: { type: String },
   username: { type: String },
+  cnic: { type: String },
   accountAddress: { type: String, required: true },
   avatar: String,
   bio: String,

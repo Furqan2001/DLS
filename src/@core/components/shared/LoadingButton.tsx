@@ -11,7 +11,7 @@ const LoadingButton = ({ loading, children, text, ...restProps }: IProps) => {
     <Button disabled={loading} variant="contained" {...restProps}>
       {text || children}
       {loading && (
-        <CircularProgress color="secondary" sx={{ ml: 2 }} size={20} />
+        <CircularProgress color="success" sx={{ ml: 2 }} size={20} />
       )}
     </Button>
   );

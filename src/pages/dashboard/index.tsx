@@ -60,7 +60,7 @@ const Dashboard = () => {
           <StatisticsCard
             stats={allAdmins}
             mainTitle="All Admins"
-            description="Stats about total number of registered admins in this platform"
+            description="Total number of registered admins"
             title="Total Admins"
             icon={<AdminPanelSettingsIcon />}
           />
@@ -69,8 +69,8 @@ const Dashboard = () => {
           <StatisticsCard
             stats={allModerators}
             mainTitle="All Moderators"
-            description="Stats about total number of registered moderators in this platform"
-            title="Total moderators"
+            description="Total number of registered moderators"
+            title="Total Moderators"
             icon={<AdminPanelSettingsIcon />}
             color="error"
           />
@@ -79,8 +79,8 @@ const Dashboard = () => {
           <StatisticsCard
             stats={landRecords?.length}
             mainTitle="All  Lands"
-            description="Stats about total number of lands in this platform"
-            title="Total lands"
+            description="Total number of lands added"
+            title="Total Lands"
             icon={<AdminPanelSettingsIcon />}
             color="info"
           />

@@ -23,9 +23,12 @@ import {
   URLS,
 } from "../../../@core/globals/enums";
 import LandDetailWrapper from "../../../views/Lands/LandDetailWrapper";
+import { useUserInfo } from "src/common/context/UserInfoContext";
 
 const Lands = () => {
-  return <LandDetailWrapper />;
+  const { userRole } = useUserInfo();
+
+  return <LandDetailWrapper hideFilter={userRole === "visitor"} />;
 };
 
 export default withAuth(Lands);

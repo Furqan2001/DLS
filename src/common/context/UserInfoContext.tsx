@@ -26,6 +26,7 @@ const initialValue: IUserInfoContext = {
     username: "",
     name: "",
     email: "",
+    cnic: ""
   },
   loadingUserInfo: false,
   userAddress: "",
@@ -34,6 +35,7 @@ const initialValue: IUserInfoContext = {
     name: "",
     username: "",
     email: "",
+    cnic: ""
   }),
   fetchCurrentUserDetail: async () => {},
 };

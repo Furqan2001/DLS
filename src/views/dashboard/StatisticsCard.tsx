@@ -61,16 +61,6 @@ const StatisticsCard = ({ mainTitle, description, ...data }: IProps) => {
     <Card>
       <CardHeader
         title={mainTitle}
-        action={
-          <IconButton
-            size="small"
-            aria-label="settings"
-            className="card-more-options"
-            sx={{ color: "text.secondary" }}
-          >
-            <DotsVertical />
-          </IconButton>
-        }
         subheader={
           <Typography variant="body2">
             <Box

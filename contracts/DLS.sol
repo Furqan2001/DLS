@@ -388,7 +388,6 @@ contract DLS {
 
     //fetch a single property
     function fetchSingleProperty(
-    
         uint256 _itemId
     ) public view returns (PropertyItem memory) {
         return idToPropertyItem[_itemId];
@@ -452,7 +451,7 @@ contract DLS {
     // fetch all UnderReview Properties
     function fetchSpecificStatusProperties(
         Status propertyStatus
-    ) private view verifiedModeratorORAdmin returns (PropertyItem[] memory) {
+    ) private view returns (PropertyItem[] memory) {
         uint256 itemCount = _itemIds.current();
         uint256 propertyCount = 0;
         uint256 currentIndex = 0;

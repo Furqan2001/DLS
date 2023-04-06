@@ -39,6 +39,7 @@ interface IProps {
 }
 
 const TabInfo = ({ userInfo }: IProps) => {
+  const [openAlert, setOpenAlert] = useState<boolean>(false);
   const [formState, setFormState] = useState({
     bio: "",
     birthDate: null,
@@ -51,6 +52,7 @@ const TabInfo = ({ userInfo }: IProps) => {
   const { fetchCurrentUserDetail } = useUserInfo();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (openAlert) setOpenAlert(false);
     setFormState({ ...formState, [e.target.name]: e.target.value });
   };
 
@@ -71,6 +73,7 @@ const TabInfo = ({ userInfo }: IProps) => {
     try {
       await updateUserBioInfo(formData);
       await fetchCurrentUserDetail();
+      setOpenAlert(true);
     } catch (err) {
       console.log("err is ", err);
       setErr(err?.message);
@@ -116,9 +119,10 @@ const TabInfo = ({ userInfo }: IProps) => {
                 id="account-settings-date"
                 placeholderText="MM-DD-YYYY"
                 customInput={<CustomInput />}
-                onChange={(date: Date) =>
+                onChange={(date: Date) => {
+                  if(openAlert) setOpenAlert(false)
                   setFormState({ ...formState, birthDate: date })
-                }
+                }}
               />
             </DatePickerWrapper>
           </Grid>
@@ -134,7 +138,7 @@ const TabInfo = ({ userInfo }: IProps) => {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={12}>
             <FormControl>
               <FormLabel sx={{ fontSize: "0.875rem" }}>Gender</FormLabel>
               <RadioGroup
@@ -163,7 +167,7 @@ const TabInfo = ({ userInfo }: IProps) => {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={8} sm={4} md={2.5}>
             <LoadingButton
               onClick={submitValue}
               variant="contained"
@@ -173,8 +177,19 @@ const TabInfo = ({ userInfo }: IProps) => {
               Save Changes
             </LoadingButton>
           </Grid>
+          {openAlert &&
+            <Grid item sx={{marginTop: -1}}>
+              <Alert severity="success">
+                Settings Updated
+              </Alert>
+            </Grid>
+          }
         </Grid>
-        {err && <Alert severity="error">{err}</Alert>}
+        {err &&
+          <Grid item>
+            <Alert severity="error">{err}</Alert>
+          </Grid> 
+        }
       </form>
     </CardContent>
   );

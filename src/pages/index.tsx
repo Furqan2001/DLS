@@ -68,10 +68,18 @@ const LoginPage = () => {
   const handleLogin = () => connectToWallet();
 
   return (
-    <Box className="content-center">
+    <Box
+      className="content-center"
+      sx={{
+        background: "url(/images/background.png)",
+      }}
+    >
       <Card sx={{ zIndex: 1 }}>
         <CardContent
-          sx={{ padding: (theme) => `${theme.spacing(12, 9, 7)} !important` }}
+          sx={{
+            padding: (theme) => `${theme.spacing(12, 9, 7)} !important`,
+            backgroundColor: "#e8e9f2",
+          }}
         >
           <Box
             sx={{

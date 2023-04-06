@@ -119,6 +119,7 @@ const LandDetail = () => {
         Number(itemId),
         landRecord.status === LAND_RECORD_STATUS.underChangeReview
       );
+      router.push(`${URLS.allLands}`);
     } else if (type === "reject") {
       setShowRejectionBox(true);
     } else if (type === "previousOwner" && formState.previous_onwers_hashes) {
@@ -154,6 +155,7 @@ const LandDetail = () => {
     if (!rejectionBoxMsg) return;
 
     await Promise.all([rejectPropertyWrapper(), sendRejectPropertyEmail()]);
+    router.push(URLS.allLands);
     if (!contractErr) router.push(URLS.allLands);
   };
 
@@ -165,11 +167,11 @@ const LandDetail = () => {
           titleTypographyProps={{ variant: "h6" }}
         />
 
-        {formState && landRecord  && (
+        {formState && landRecord && (
           <>
             <Divider />
             <CardContent>
-              <LandDetails hideFileField formState={formState} />
+              <LandDetails hideFileField disableFields formState={formState} />
               <Typography fontSize={12}>
                 Each action will take approx 2-3 mins, so please wait after
                 pressing the button. So if you see no changes even after 2-3
@@ -183,7 +185,7 @@ const LandDetail = () => {
                 handleAction={handleAction}
                 landStatus={landRecord?.status}
                 itemId={itemId as string}
-                isAdmin = {userRole === ROLES.admin}
+                isAdmin={userRole === ROLES.admin}
                 showOwnlyPreviousHistoryBtn={!!formState.previous_onwers_hashes}
               />
               <a

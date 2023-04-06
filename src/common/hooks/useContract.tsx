@@ -90,7 +90,7 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
       if (role === ROLES.admin) {
         router.push(URLS.dashboard);
       } else {
-        router.push(URLS.profile);
+        router.push(URLS.allLands);
       }
     }
   };

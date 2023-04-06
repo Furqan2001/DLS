@@ -67,7 +67,7 @@ interface IProps {
 
 const TabAccount = ({ userInfo }: IProps) => {
   // ** State
-  const [openAlert, setOpenAlert] = useState<boolean>(true);
+  const [openAlert, setOpenAlert] = useState<boolean>(false);
   const [uploadedFile, setUploadedFile] = useState<FileList>();
   const [imgSrc, setImgSrc] = useState<string>("/images/avatars/1.png");
   const [err, setErr] = useState("");
@@ -80,12 +80,14 @@ const TabAccount = ({ userInfo }: IProps) => {
     username: "",
     name: "",
     email: "",
+    cnic: "",
     role: ROLES.visitor,
   });
 
   const onChangeFile = (file: ChangeEvent) => {
     const reader = new FileReader();
     const { files } = file.target as HTMLInputElement;
+    if(openAlert) setOpenAlert(false);
     setUploadedFile(files);
     if (files && files.length !== 0) {
       reader.onload = () => setImgSrc(reader.result as string);
@@ -95,6 +97,7 @@ const TabAccount = ({ userInfo }: IProps) => {
   };
 
   const onChangeFormFields = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (openAlert) setOpenAlert(false);
     setFormState({ ...formState, [e.target.name]: e.target.value });
   };
 
@@ -106,6 +109,7 @@ const TabAccount = ({ userInfo }: IProps) => {
       name: userInfo.name,
       email: userInfo.email,
       username: userInfo.username,
+      cnic: userInfo.cnic
     });
     if (userInfo.avatar) {
       setImgSrc(userInfo.avatar);
@@ -126,11 +130,14 @@ const TabAccount = ({ userInfo }: IProps) => {
     formData.append("name", formState.name);
     formData.append("email", formState.email);
     formData.append("username", formState.username);
+    formData.append("cnic", formState.cnic);
     if (uploadedFile) formData.append("files", uploadedFile?.[0]);
 
     try {
+      console.log(formData);
       await updateUserInfo(formData);
       await fetchCurrentUserDetail();
+      setOpenAlert(true);
     } catch (err) {
       console.log("err in updating the user info ", err);
       setErr(err?.message);
@@ -198,6 +205,15 @@ const TabAccount = ({ userInfo }: IProps) => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Cnic"
+              name="cnic"
+              value={formState.cnic}
+              onChange={onChangeFormFields}
+            />
+          </Grid>
+          <Grid item xs={12}>
             <FormControl fullWidth>
               <InputLabel>Role</InputLabel>
               <Select
@@ -207,7 +223,7 @@ const TabAccount = ({ userInfo }: IProps) => {
                 defaultValue="visitor"
               >
                 <MenuItem value={ROLES.admin}>{ROLES.admin}</MenuItem>
-                <MenuItem value={ROLES.moderator}>{ROLES.visitor}</MenuItem>
+                <MenuItem value={ROLES.moderator}>{ROLES.moderator}</MenuItem>
                 <MenuItem value={ROLES.visitor}>{ROLES.visitor}</MenuItem>
               </Select>
             </FormControl>
@@ -242,7 +258,7 @@ const TabAccount = ({ userInfo }: IProps) => {
             </Grid>
           ) : null} */}
 
-          <Grid item xs={12}>
+          <Grid item xs={8} sm={4} md={2.5}>
             <LoadingButton
               variant="contained"
               onClick={submitUserData}
@@ -252,7 +268,18 @@ const TabAccount = ({ userInfo }: IProps) => {
               Save Changes
             </LoadingButton>
           </Grid>
-          {err && <Alert severity="error">{err}</Alert>}
+            {openAlert &&
+              <Grid item sx={{marginTop: -1}}>
+                <Alert severity="success">
+                  Settings Updated
+                </Alert>
+              </Grid>
+            }
+          {err &&
+            <Grid item>
+              <Alert severity="error">{err}</Alert>
+            </Grid> 
+          }
         </Grid>
       </form>
     </CardContent>

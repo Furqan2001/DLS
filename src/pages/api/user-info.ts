@@ -50,6 +50,7 @@ const updateUserInfo = async (data) => {
     email,
     avatar,
     username,
+    cnic,
     bio,
     phoneNumber,
     birthDate,
@@ -71,6 +72,7 @@ const updateUserInfo = async (data) => {
       user.email = email || user.email;
       user.avatar = avatar || user.avatar;
       user.username = username || user.username;
+      user.cnic = cnic || user.cnic;
       user.bio = bio || user.bio;
       user.birthDate = birthDate || user.birthDate;
       user.phoneNumber = phoneNumber || user.phoneNumber;
@@ -82,6 +84,7 @@ const updateUserInfo = async (data) => {
         email,
         avatar,
         username,
+        cnic,
         bio,
         birthDate,
         phoneNumber,
@@ -113,6 +116,7 @@ const parseForm = (req) => {
       const accountAddress = fields.accountAddress?.[0];
       const email = fields.email?.[0];
       const username = fields.username?.[0];
+      const cnic = fields.cnic?.[0];
       const bio = fields.bio?.[0];
       const phoneNumber = fields.phoneNumber?.[0];
       const birthDate = fields.birthDate?.[0];
@@ -133,6 +137,7 @@ const parseForm = (req) => {
           email,
           avatar,
           username,
+          cnic,
           bio,
           phoneNumber,
           birthDate,
@@ -185,9 +190,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method == "GET") {
     const { accountAddress } = req.query;
     if (!accountAddress) {
-      return res
-        .status(400)
-        .json({ message: "accountAddress is required" });
+      return res.status(400).json({ message: "accountAddress is required" });
     }
     try {
       const user = await fetchUserInfo(accountAddress as string);

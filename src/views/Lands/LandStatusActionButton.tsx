@@ -43,7 +43,7 @@ const LandStatusActionButton = ({
 }: IProps) => {
   // buttons will show according to the status of the land records
   const buttonsList = useMemo(() => {
-    if (landStatus === LAND_RECORD_STATUS.underChangeReview) {
+    if (landStatus === LAND_RECORD_STATUS.underChangeReview && isAdmin) {
       if (!itemId) return [allButtons[2]];
 
       return allButtons;

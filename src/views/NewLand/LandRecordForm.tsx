@@ -43,6 +43,7 @@ import LandDetails from "../Lands/LandDetails";
 import { client, DOMAIN_URL } from "../../@core/helpers/ipfs";
 import { IIPFSRecord } from "../../@core/globals/types";
 import { URLS } from "../../@core/globals/enums";
+import { useRouter } from "next/router";
 
 const ImgStyled = styled("img")(({ theme }) => ({
   width: 120,
@@ -73,6 +74,8 @@ const NewLand = ({
   itemId,
   ipfsHash,
 }: IProps) => {
+  const router = useRouter();
+
   const [uploadingImageStatus, setuploadingImageStatus] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState(false);
   const [fileUrl, setFileUrl] = useState("");
@@ -142,12 +145,6 @@ const NewLand = ({
     try {
       const added = await client.add(data);
 
-      //use added.path as ipfsHash
-
-      //For console testing
-      const url = DOMAIN_URL + added.path;
-      console.log(url);
-
       if (form === "newRecord") await addNewLandRecord(added.path);
       else {
         // transfer ownership
@@ -155,6 +152,7 @@ const NewLand = ({
       }
 
       setSubmissionStatus(false);
+      router.push(`${URLS.allLands}`);
 
       // setTimeout(() => {
       //   window.location.href = URLS.allLands;

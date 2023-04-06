@@ -46,6 +46,7 @@ interface IProps {
   onChangeDate?: (date: Date) => void;
   uploadingImageStatus?: boolean;
   hideFileField?: boolean;
+  disableFields?: boolean;
 }
 
 // ** Styled Avatar component
@@ -66,6 +67,12 @@ const CustomInput = forwardRef((props, ref) => (
   />
 ));
 
+const TextFieldStyled = styled(TextField)({
+  "& .Mui-disabled": {
+    "-webkit-text-fill-color": "#000 !important",
+  },
+});
+
 const LandDetails = ({
   formState,
   onChange,
@@ -73,6 +80,7 @@ const LandDetails = ({
   uploadingImageStatus,
   hideFileField,
   onChangeDate,
+  disableFields,
 }: IProps) => {
   return (
     <Box>
@@ -84,38 +92,41 @@ const LandDetails = ({
             </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="full name"
               name="owner_full_name"
               required
               value={formState.owner_full_name}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="Father name"
               name="owner_father_name"
               required
               value={formState.owner_father_name}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="Mother Name"
               name="owner_mother_name"
               required
               value={formState.owner_mother_name}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="email"
               type="email"
@@ -123,20 +134,22 @@ const LandDetails = ({
               required
               value={formState.owner_email}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="Phone Number"
               name="owner_phone"
               required
               value={formState.owner_phone}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="CNIC Number"
               placeholder="sample ( 31304-4537123-3 )"
@@ -144,10 +157,11 @@ const LandDetails = ({
               required
               value={formState.owner_cnic}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
+            <TextFieldStyled
               multiline
               minRows={1}
               fullWidth
@@ -156,6 +170,7 @@ const LandDetails = ({
               required
               value={formState.owner_complete_address}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
 
@@ -168,7 +183,7 @@ const LandDetails = ({
             </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="Total Land Area"
               placeholder="land area in sq ft"
@@ -176,10 +191,11 @@ const LandDetails = ({
               required
               value={formState.land_total_area}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="Amount Paid"
               placeholder="amount paid"
@@ -187,11 +203,12 @@ const LandDetails = ({
               required
               value={formState.land_amount}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="City"
               placeholder="city"
@@ -199,10 +216,11 @@ const LandDetails = ({
               required
               value={formState.land_city}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="District"
               placeholder="District"
@@ -210,11 +228,12 @@ const LandDetails = ({
               required
               value={formState.land_district}
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
+            <TextFieldStyled
               multiline
               fullWidth
               minRows={1}
@@ -224,28 +243,40 @@ const LandDetails = ({
               value={formState.land_complete_location}
               required
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <DatePickerWrapper>
-              <DatePicker
-                selected={formState.land_purchase_date || new Date()}
-                showYearDropdown
-                showMonthDropdown
-                id="account-settings-date"
-                placeholderText="MM-DD-YYYY"
-                customInput={<CustomInput />}
+          {!disableFields ? (
+            <Grid item xs={12} sm={6}>
+              <DatePickerWrapper>
+                <DatePicker
+                  selected={formState.land_purchase_date || new Date()}
+                  showYearDropdown
+                  showMonthDropdown
+                  id="account-settings-date"
+                  placeholderText="MM-DD-YYYY"
+                  customInput={<CustomInput />}
+                  value={formState.land_purchase_date}
+                  name="land_purchase_date"
+                  required
+                  onChange={onChangeDate}
+                />
+              </DatePickerWrapper>
+            </Grid>
+          ) : (
+            <Grid item xs={12} sm={6}>
+              <TextFieldStyled
+                fullWidth
+                label="Purchase Date"
                 value={formState.land_purchase_date}
-                name="land_purchase_date"
-                required
-                onChange={onChangeDate}
+                disabled={disableFields || false}
               />
-            </DatePickerWrapper>
-          </Grid>
+            </Grid>
+          )}
 
           <Grid item xs={12} sm={6}>
-            <TextField
+            <TextFieldStyled
               multiline
               fullWidth
               minRows={1}
@@ -254,6 +285,7 @@ const LandDetails = ({
               value={formState.plot_num}
               required
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
 
@@ -292,12 +324,13 @@ const LandDetails = ({
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
+            <TextFieldStyled
               fullWidth
               label="Previous Owner CNIC"
               value={formState.prev_owner_cnic}
               name="prev_owner_cnic"
               onChange={onChange}
+              disabled={disableFields || false}
             />
           </Grid>
         </Grid>
