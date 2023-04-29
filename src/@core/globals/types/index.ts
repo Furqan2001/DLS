@@ -52,6 +52,7 @@ export interface IIPFSRecord {
   land_purchase_date?: Date;
   prev_owner_cnic?: string;
   previous_onwers_hashes?: string[];
+  mapPoints?: { lat: number; lng: number }[];
 }
 
 export interface ISendMail {

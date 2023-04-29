@@ -6,10 +6,6 @@ async function main() {
   const DLS = await hre.ethers.getContractFactory("DLS");
   const decentralizedLandSecurity = await DLS.deploy();
   await decentralizedLandSecurity.deployed();
-  console.log(
-    "decentralizedLandSecurity deployed to:",
-    decentralizedLandSecurity.address
-  );
 
   fs.writeFileSync(
     path.join(__dirname, "../src/common/constants/", "contractAddress.ts"),

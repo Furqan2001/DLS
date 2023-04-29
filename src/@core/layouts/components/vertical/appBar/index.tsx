@@ -45,8 +45,6 @@ const LayoutAppBar = (props: Props) => {
   // ** Props
   const { settings, verticalAppBarContent: userVerticalAppBarContent } = props;
 
-  console.log(userVerticalAppBarContent(props));
-
   // ** Hooks
   const theme = useTheme();
 

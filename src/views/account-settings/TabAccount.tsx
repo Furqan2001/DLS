@@ -87,7 +87,7 @@ const TabAccount = ({ userInfo }: IProps) => {
   const onChangeFile = (file: ChangeEvent) => {
     const reader = new FileReader();
     const { files } = file.target as HTMLInputElement;
-    if(openAlert) setOpenAlert(false);
+    if (openAlert) setOpenAlert(false);
     setUploadedFile(files);
     if (files && files.length !== 0) {
       reader.onload = () => setImgSrc(reader.result as string);
@@ -109,7 +109,7 @@ const TabAccount = ({ userInfo }: IProps) => {
       name: userInfo.name,
       email: userInfo.email,
       username: userInfo.username,
-      cnic: userInfo.cnic
+      cnic: userInfo.cnic,
     });
     if (userInfo.avatar) {
       setImgSrc(userInfo.avatar);
@@ -134,7 +134,6 @@ const TabAccount = ({ userInfo }: IProps) => {
     if (uploadedFile) formData.append("files", uploadedFile?.[0]);
 
     try {
-      console.log(formData);
       await updateUserInfo(formData);
       await fetchCurrentUserDetail();
       setOpenAlert(true);
@@ -268,18 +267,16 @@ const TabAccount = ({ userInfo }: IProps) => {
               Save Changes
             </LoadingButton>
           </Grid>
-            {openAlert &&
-              <Grid item sx={{marginTop: -1}}>
-                <Alert severity="success">
-                  Settings Updated
-                </Alert>
-              </Grid>
-            }
-          {err &&
+          {openAlert && (
+            <Grid item sx={{ marginTop: -1 }}>
+              <Alert severity="success">Settings Updated</Alert>
+            </Grid>
+          )}
+          {err && (
             <Grid item>
               <Alert severity="error">{err}</Alert>
-            </Grid> 
-          }
+            </Grid>
+          )}
         </Grid>
       </form>
     </CardContent>

@@ -52,7 +52,7 @@ export const DLSContextProvider = ({ children }) => {
 
   const accountChangedHandler = async (newAccount) => {
     const address = await newAccount.getAddress();
-    console.log("address is ", address);
+
     setUserAddress(address);
     const balance = await newAccount.getBalance();
 

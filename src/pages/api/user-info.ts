@@ -122,7 +122,6 @@ const parseForm = (req) => {
       const birthDate = fields.birthDate?.[0];
       const gender = fields.gender?.[0];
 
-      console.log("bio is ", bio, gender, phoneNumber, birthDate);
       const files = filesField.files;
 
       let avatar;

@@ -38,7 +38,7 @@ import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
 import { IIPFSRecord } from "../../@core/globals/types";
 import { Box, styled } from "@mui/material";
 import MuiAvatar, { AvatarProps } from "@mui/material/Avatar";
-import GoogleMap from "./Map";
+import MapDrawShape from "./ShapeMap";
 
 interface IProps {
   formState: IIPFSRecord;
@@ -291,7 +291,12 @@ const LandDetails = ({
           </Grid>
 
           <Grid item xs={12}>
-            <GoogleMap />
+            <MapDrawShape
+              shape={formState.mapPoints}
+              onDrawShape={(shape) => {
+                onChange({ target: { name: "mapPoints", value: shape } });
+              }}
+            />
           </Grid>
 
           {!hideFileField && (

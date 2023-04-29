@@ -33,7 +33,7 @@ const Dashboard = () => {
     (async () => {
       try {
         const users = await fetchAllUsers("users");
-        console.log("users ", users);
+
         let totalAdmins = 0,
           totalModerators = 0;
 

@@ -85,8 +85,6 @@ const LandDetail = () => {
       try {
         const res = await getValueFromHash<IIPFSRecord>(ipfsHash as string);
 
-        console.log("res is ", res);
-
         setFormState({
           ...res,
           land_purchase_date: res.land_purchase_date
