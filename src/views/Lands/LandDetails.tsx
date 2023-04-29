@@ -38,6 +38,7 @@ import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
 import { IIPFSRecord } from "../../@core/globals/types";
 import { Box, styled } from "@mui/material";
 import MuiAvatar, { AvatarProps } from "@mui/material/Avatar";
+import GoogleMap from "./Map";
 
 interface IProps {
   formState: IIPFSRecord;
@@ -287,6 +288,10 @@ const LandDetails = ({
               onChange={onChange}
               disabled={disableFields || false}
             />
+          </Grid>
+
+          <Grid item xs={12}>
+            <GoogleMap />
           </Grid>
 
           {!hideFileField && (

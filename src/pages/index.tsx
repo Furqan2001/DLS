@@ -23,7 +23,7 @@ import Facebook from "mdi-material-ui/Facebook";
 import EyeOutline from "mdi-material-ui/EyeOutline";
 import EyeOffOutline from "mdi-material-ui/EyeOffOutline";
 
-import Wallet from "mdi-material-ui/wallet";
+import { Wallet } from "mdi-material-ui";
 // ** Configs
 import themeConfig from "src/configs/themeConfig";
 

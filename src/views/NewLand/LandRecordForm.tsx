@@ -44,6 +44,7 @@ import { client, DOMAIN_URL } from "../../@core/helpers/ipfs";
 import { IIPFSRecord } from "../../@core/globals/types";
 import { URLS } from "../../@core/globals/enums";
 import { useRouter } from "next/router";
+import { sendMail } from "../../common/api/sendMail";
 
 const ImgStyled = styled("img")(({ theme }) => ({
   width: 120,
@@ -125,6 +126,16 @@ const NewLand = ({
     setFormState({ ...formState, [e.target.name]: e.target.value });
   };
 
+  const handleMailSendWrapper = async (ipfsHash: string, to: string) => {
+    try {
+      await sendMail({
+        subject: "Property Req Created",
+        message: `Your property req has been created with the following ipfsHash ${ipfsHash}`,
+        to,
+      });
+    } catch (err) {}
+  };
+
   const handleSubmit = async () => {
     for (let key in formState) {
       if (key !== "prev_owner_cnic" && formState[key] === "")
@@ -145,12 +156,14 @@ const NewLand = ({
     try {
       const added = await client.add(data);
 
-      if (form === "newRecord") await addNewLandRecord(added.path);
-      else {
+      if (form === "newRecord") {
+        await addNewLandRecord(added.path);
+      } else {
         // transfer ownership
         await transferLandOwnership(itemId, added.path);
       }
 
+      await handleMailSendWrapper(added.path, dataObj.owner_email);
       setSubmissionStatus(false);
       router.push(`${URLS.allLands}`);
 
