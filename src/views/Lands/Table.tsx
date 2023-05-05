@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 
 // ** MUI Imports
 import Paper from "@mui/material/Paper";
@@ -12,13 +12,15 @@ import TableContainer from "@mui/material/TableContainer";
 import TablePagination from "@mui/material/TablePagination";
 import { IGenericColor, ILandRecord } from "../../@core/globals/types";
 import { Chip } from "@mui/material";
+import { IIPFSRecord } from "../../@core/globals/types";
+import { getValueFromHash } from "src/@core/helpers/ipfs";
 import Link from "next/link";
 import { LAND_RECORD_STATUS, ROLES, URLS } from "../../@core/globals/enums";
 import LoadingButton from "../../@core/components/shared/LoadingButton";
 import { useRouter } from "next/router";
 
 interface Column {
-  id: "ipfsHash" | "itemId" | "status" | "actions";
+  id: "ipfsHash" | "ownerName" | "location" | "itemId" | "status" | "actions";
   label: string;
   minWidth?: number;
   align?: "right";
@@ -27,7 +29,9 @@ interface Column {
 
 const columns: readonly Column[] = [
   { id: "itemId", label: "Id", minWidth: 100 },
-  { id: "ipfsHash", label: "IPFS HASH", minWidth: 200 },
+  { id: "ownerName", label: "Owner", minWidth: 100 },
+  { id: "location", label: "Land location", minWidth: 200 },
+  // { id: "ipfsHash", label: "IPFS HASH", minWidth: 200 },
   { id: "status", label: "Status", minWidth: 100 },
   { id: "actions", label: "Actions", minWidth: 100 },
 ];
@@ -57,8 +61,42 @@ interface IProps {
 const LandTable = ({ tableRole, data = [], redirectUrl }: IProps) => {
   // ** States
   const [page, setPage] = useState<number>(0);
+  const [landRecords, setLandRecords] = useState<ILandRecord[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  // const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchLandData = async (data: ILandRecord) => {
+      try {
+        const res = await getValueFromHash<IIPFSRecord>(
+          data.ipfsHash as string
+        );
+        return {
+          ...data,
+          ownerName: res.owner_full_name,
+          location: res.land_complete_location,
+        } as ILandRecord;
+      } catch (err) {
+        console.log("err is ", err);
+      }
+    };
+
+    const fetchData = async () => {
+      const records: ILandRecord[] = [];
+
+      for (let record of data) {
+        const updatedRecord = await fetchLandData(record);
+        if (updatedRecord !== null) {
+          records.push(updatedRecord);
+        }
+      }
+
+      setLandRecords(records);
+    };
+
+    fetchData();
+  }, [data]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -91,7 +129,7 @@ const LandTable = ({ tableRole, data = [], redirectUrl }: IProps) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data
+            {landRecords
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
                 return (
@@ -135,7 +173,8 @@ const LandTable = ({ tableRole, data = [], redirectUrl }: IProps) => {
                           </TableCell>
                         );
                       }
-
+                      // console.log(column);
+                      // console.log(value);
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {column.format && typeof value === "number"

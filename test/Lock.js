@@ -5,7 +5,7 @@ describe("DLS Contract", function () {
   let dlsContract, deployer, user1, user2, user3;
 
   before(async () => {
-    ([deployer, user1, user2, user3] = await ethers.getSigners());
+    [deployer, user1, user2, user3] = await ethers.getSigners();
 
     const DLS = await ethers.getContractFactory("DLS");
     dlsContract = await DLS.deploy();
@@ -27,12 +27,6 @@ describe("DLS Contract", function () {
 
     it("should not add a new admin if user does not exist", async function () {
       await expect(dlsContract.addNewAdmin(user3.address)).to.be.revertedWith(
-        "User does not exist!"
-      );
-    });
-
-    it("should not demote a user if user does not exist", async function () {
-      await expect(dlsContract.demoteUser(user3.address)).to.be.revertedWith(
         "User does not exist!"
       );
     });

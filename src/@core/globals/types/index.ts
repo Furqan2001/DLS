@@ -31,6 +31,8 @@ export interface IGenericColor {
 export interface ILandRecord {
   ipfsHash: string;
   itemId: number;
+  ownerName?: string;
+  location?: string;
   status: LAND_RECORD_STATUS;
 }
 

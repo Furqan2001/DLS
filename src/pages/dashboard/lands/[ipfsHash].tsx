@@ -165,7 +165,7 @@ const LandDetail = () => {
           titleTypographyProps={{ variant: "h6" }}
         />
 
-        {formState && landRecord && (
+        {formState && (
           <>
             <Divider />
             <CardContent>
@@ -237,4 +237,4 @@ const LandDetail = () => {
   );
 };
 
-export default withAuth(LandDetail);
+export default LandDetail;

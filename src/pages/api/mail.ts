@@ -18,7 +18,7 @@ export const sendMailApiWrapper = async ({ to, subject, message }) => {
   });
 
   const info = await transporter.sendMail({
-    from: "DLS No-reply <injurdlion332@outlook.com>", // sender address
+    from: "DLS No-reply <ahmedfurqan01@outlook.com>", // sender address
     to: to,
     subject: subject, // Subject line
     text: message, // plain text body

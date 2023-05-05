@@ -27,6 +27,7 @@ const fetchContract = (signerOrProvider: ethers.providers.JsonRpcSigner) =>
 
 const useContract = ({ userAddress }: { userAddress: string }) => {
   const [contract, setContract] = useState<ethers.Contract>();
+  const [custodialContract, setCustodialContract] = useState<ethers.Contract>();
   const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState<ROLES>();
   const [contractErr, setContractErr] = useState("");
@@ -168,11 +169,11 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
   );
 
   const addNewLandRecord = useCallback(
-    async (ipfsHash: string) => {
+    async (ipfsHash: string, cnic: string) => {
       if (!contract) return;
       setLoading(true);
       try {
-        await contract.createProperty(ipfsHash);
+        await contract.createProperty(ipfsHash, cnic);
       } catch (err) {
         console.log("err in making the moderator ", contract, err);
         setContractErr(String(err?.error?.message));
@@ -211,6 +212,41 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
         return lands;
       } catch (err) {
         console.log("err in making the moderator ", contract, err);
+      }
+      setLoading(false);
+    },
+    [!!contract]
+  );
+
+  const connectCustodialWallet = () => {
+    const provider = new ethers.providers.JsonRpcProvider(
+      `https://sepolia.infura.io/v3/${process.env.PROJECT_ID}`
+    );
+    const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
+    const contract = new ethers.Contract(DLSAddress, abi, signer);
+    setCustodialContract(contract);
+    return contract;
+  };
+
+  const getOwnerLandRecords = useCallback(
+    async (cnic: string) => {
+      let contract = custodialContract;
+      if (!contract) contract = connectCustodialWallet();
+      setLoading(true);
+      let landsRecords;
+      try {
+        landsRecords = await contract.fetchOwnerProperties(cnic);
+
+        const lands = landsRecords?.map((land) => ({
+          ipfsHash: land.ipfsHash,
+          itemId: convertBigHexNumberToNumber(land.itemId),
+          status: getLandRecordStatus(land.status),
+        })) as ILandRecord[];
+
+        return lands;
+      } catch (err) {
+        console.log("Error in fetching User records ", contract, err);
       }
       setLoading(false);
     },
@@ -278,11 +314,11 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
   );
 
   const transferLandOwnership = useCallback(
-    async (itemId: string, ipfsHash: string) => {
+    async (itemId: string, ipfsHash: string, cnic: string) => {
       if (!contract) return;
       setLoading(true);
       try {
-        await contract.changeOwnership(BigNumber.from(itemId), ipfsHash);
+        await contract.changeOwnership(BigNumber.from(itemId), ipfsHash, cnic);
       } catch (err) {
         console.log("err in transfering the ownership ", contract, err);
         setContractErr(String(err?.error?.message));
@@ -308,6 +344,7 @@ const useContract = ({ userAddress }: { userAddress: string }) => {
     addNewAdmin,
     addNewLandRecord,
     getAllLandRecords,
+    getOwnerLandRecords,
     approveProperty,
     rejectProperty,
     fetchSinglePropertyInfo,

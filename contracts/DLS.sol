@@ -52,6 +52,7 @@ contract DLS {
         string ipfsHash;
         address addedBy;
         address updatedBy;
+        string ownerCnic;
         string message;
     }
 
@@ -164,40 +165,40 @@ contract DLS {
     }
 
     //Demote a user from the status of admin/moderator
-    function demoteUser(
-        address _userAddress
-    ) public verifiedAdmin returns (bool) {
-        require(users[_userAddress].isRegistered, "User does not exist!");
-        require(
-            users[_userAddress].role != Role.Visitor,
-            "User cannot be demoted!"
-        );
+    // function demoteUser(
+    //     address _userAddress
+    // ) public verifiedAdmin returns (bool) {
+    //     require(users[_userAddress].isRegistered, "User does not exist!");
+    //     require(
+    //         users[_userAddress].role != Role.Visitor,
+    //         "User cannot be demoted!"
+    //     );
 
-        uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
+    //     uint256 majorityAdminCount = (totalAdmins.current() / 2) + 1;
 
-        for (
-            uint256 i = 0;
-            i < users[_userAddress].removalRequests.length;
-            i++
-        ) {
-            if (users[_userAddress].removalRequests[i] == msg.sender) {
-                revert();
-            }
-        }
-        users[_userAddress].removalRequests.push(msg.sender);
+    //     for (
+    //         uint256 i = 0;
+    //         i < users[_userAddress].removalRequests.length;
+    //         i++
+    //     ) {
+    //         if (users[_userAddress].removalRequests[i] == msg.sender) {
+    //             revert();
+    //         }
+    //     }
+    //     users[_userAddress].removalRequests.push(msg.sender);
 
-        if (users[_userAddress].removalRequests.length >= majorityAdminCount) {
-            if (users[_userAddress].role == Role.Admin) {
-                totalAdmins.decrement();
-            } else {
-                totalModerators.decrement();
-            }
-            users[_userAddress].role = Role.Visitor;
-            delete users[_userAddress].modApprovals;
-            delete users[_userAddress].adminApprovals;
-        }
-        return true;
-    }
+    //     if (users[_userAddress].removalRequests.length >= majorityAdminCount) {
+    //         if (users[_userAddress].role == Role.Admin) {
+    //             totalAdmins.decrement();
+    //         } else {
+    //             totalModerators.decrement();
+    //         }
+    //         users[_userAddress].role = Role.Visitor;
+    //         delete users[_userAddress].modApprovals;
+    //         delete users[_userAddress].adminApprovals;
+    //     }
+    //     return true;
+    // }
 
     // get the logged in user
     function getUser() public view returns (UserReturnItem memory) {
@@ -299,7 +300,8 @@ contract DLS {
 
     // Create a New Property
     function createProperty(
-        string memory _ipfsHashValue
+        string memory _ipfsHashValue,
+        string memory _cnic
     ) public verifiedModerator {
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
@@ -310,6 +312,7 @@ contract DLS {
             _ipfsHashValue,
             msg.sender,
             address(0),
+            _cnic,
             ""
         );
     }
@@ -340,7 +343,8 @@ contract DLS {
     // Change Ownership of Property
     function changeOwnership(
         uint256 _itemId,
-        string memory _ipfsHashValue
+        string memory _ipfsHashValue,
+        string memory _cnic
     ) public verifiedModerator {
         require(
             idToPropertyItem[_itemId].status == Status.Approved,
@@ -352,10 +356,12 @@ contract DLS {
             idToPropertyItem[_itemId].ipfsHash,
             idToPropertyItem[_itemId].addedBy,
             msg.sender,
+            idToPropertyItem[_itemId].ownerCnic,
             ""
         );
         idToPropertyItem[_itemId].status = Status.UnderChangeReview;
         idToPropertyItem[_itemId].ipfsHash = _ipfsHashValue;
+        idToPropertyItem[_itemId].ownerCnic = _cnic;
         idToPropertyItem[_itemId].updatedBy = msg.sender;
     }
 
@@ -382,8 +388,20 @@ contract DLS {
         idToPropertyItem[_itemId].ipfsHash = ownershipChangeItems[_itemId]
             .ipfsHash;
         idToPropertyItem[_itemId].updatedBy = address(0);
+        idToPropertyItem[_itemId].ownerCnic = ownershipChangeItems[_itemId]
+            .ownerCnic;
         idToPropertyItem[_itemId].message = rejectionMessage;
         delete ownershipChangeItems[_itemId];
+    }
+
+    //Pure function to compare two strings
+    function compare(
+        string memory str1,
+        string memory str2
+    ) public pure returns (bool) {
+        return
+            keccak256(abi.encodePacked(str1)) ==
+            keccak256(abi.encodePacked(str2));
     }
 
     //fetch a single property
@@ -466,6 +484,34 @@ contract DLS {
 
         for (uint256 i = 0; i < itemCount; i++) {
             if (idToPropertyItem[i + 1].status == propertyStatus) {
+                uint256 currentId = i + 1;
+                PropertyItem storage currentItem = idToPropertyItem[currentId];
+                properties[currentIndex] = currentItem;
+                currentIndex++;
+            }
+        }
+
+        return properties;
+    }
+
+    // fetch one Owner Properties
+    function fetchOwnerProperties(
+        string memory _cnic
+    ) public view returns (PropertyItem[] memory) {
+        uint256 itemCount = _itemIds.current();
+        uint256 propertyCount = 0;
+        uint256 currentIndex = 0;
+
+        for (uint256 i = 0; i < itemCount; i++) {
+            if (compare(idToPropertyItem[i + 1].ownerCnic, _cnic)) {
+                propertyCount++;
+            }
+        }
+
+        PropertyItem[] memory properties = new PropertyItem[](propertyCount);
+
+        for (uint256 i = 0; i < itemCount; i++) {
+            if (compare(idToPropertyItem[i + 1].ownerCnic, _cnic)) {
                 uint256 currentId = i + 1;
                 PropertyItem storage currentItem = idToPropertyItem[currentId];
                 properties[currentIndex] = currentItem;

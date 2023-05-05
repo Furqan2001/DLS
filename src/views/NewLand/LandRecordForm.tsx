@@ -145,7 +145,10 @@ const NewLand = ({
   }
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
+    setFormState((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleMailSendWrapper = async (ipfsHash: string, to: string) => {
@@ -159,6 +162,7 @@ const NewLand = ({
   };
 
   const handleSubmit = async () => {
+    setErr("");
     for (let key in formState) {
       if (key !== "prev_owner_cnic" && formState[key] === "")
         return setErr("all fields are required");
@@ -177,17 +181,19 @@ const NewLand = ({
     setSubmissionStatus(true);
     try {
       const added = await client.add(data);
+      const cnic = formState.owner_cnic;
 
       if (form === "newRecord") {
-        await addNewLandRecord(added.path);
+        await addNewLandRecord(added.path, cnic);
+        router.push(`${URLS.allLands}`);
       } else {
         // transfer ownership
-        await transferLandOwnership(itemId, added.path);
+        await transferLandOwnership(itemId, added.path, cnic);
+        router.push(`${URLS.allLands}`);
       }
 
       await handleMailSendWrapper(added.path, dataObj.owner_email);
       setSubmissionStatus(false);
-      router.push(`${URLS.allLands}`);
 
       // setTimeout(() => {
       //   window.location.href = URLS.allLands;

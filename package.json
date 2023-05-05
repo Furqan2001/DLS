@@ -53,6 +53,7 @@
     "react-datepicker": "^4.10.0",
     "react-dom": "18.2.0",
     "react-perfect-scrollbar": "^1.5.8",
+    "react-scroll": "^1.8.9",
     "use-places-autocomplete": "^4.0.0",
     "use-supercluster": "^0.4.0",
     "utf-8-validate": "^5.0.10",

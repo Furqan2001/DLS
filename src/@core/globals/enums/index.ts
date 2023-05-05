@@ -2,9 +2,10 @@ export enum URLS {
   dashboard = "/dashboard",
   usersDetail = "/dashboard/users",
   profile = "/dashboard/account-settings",
-  login = "/",
+  login = "/login",
+  landing = "/",
   allLands = "/dashboard/lands",
-  newOwnerships = "/dashboard/new-ownership"
+  newOwnerships = "/dashboard/new-ownership",
 }
 
 export enum ROLES {

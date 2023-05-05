@@ -31,7 +31,6 @@ export default function MapDrawShape(props) {
   }
 
   function onDrawCallback(shape) {
-    console.log(shape);
     props?.onDrawShape(shape);
     setState((prevState) => ({ ...prevState, shape, drawingMode: false }));
   }
@@ -68,7 +67,7 @@ export default function MapDrawShape(props) {
       },
     ];
 
-    console.log("initalShape ", initalShape);
+    // console.log("initalShape ", initalShape);
     mapDrawShapeManagerRef.current.initDrawnShape(initalShape);
 
     setState((prevState) => ({ ...prevState, shape: initalShape }));
@@ -87,7 +86,7 @@ export default function MapDrawShape(props) {
 
   return (
     <>
-      <div className="map-container">
+      <div className="map-container" style={{ height: "60vh" }}>
         <GoogleMapReact
           bootstrapURLKeys={props.mapBootstrap}
           options={props.mapOptions}
@@ -153,10 +152,10 @@ MapDrawShape.defaultProps = {
     tilt: 0,
   },
   defaultCenter: {
-    lat: 39.58875553716348,
-    lng: -8.576849426688483,
+    lat: 33.626057,
+    lng: 73.07144,
   },
-  defaultZoom: 7,
+  defaultZoom: 10,
   polygonOptions: {
     clickable: false,
     fillColor: "#303030",

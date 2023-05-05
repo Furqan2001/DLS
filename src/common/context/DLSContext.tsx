@@ -19,9 +19,10 @@ const initialValue = {
   fetchSpecificUser: async (userAddress: string) => ({}),
   addNewModerator: async (userAddress: string) => {},
   addNewAdmin: async (userAddress: string) => {},
-  addNewLandRecord: async (ipfsHash: string) => {},
+  addNewLandRecord: async (ipfsHash: string, cnic: string) => {},
   refreshLogin: async (address: string, skipCurrentLogin: boolean) => {},
   getAllLandRecords: async (type: GET_ALL_LAND_RECORD_STATUS) => [],
+  getOwnerLandRecords: async (cnic: string) => [],
   approveProperty: async (itemId: number, ownershipChangeReq = false) => {},
   rejectProperty: async (
     itemId: number,
@@ -29,7 +30,11 @@ const initialValue = {
     ownershipChangeReq = false
   ) => {},
   fetchSinglePropertyInfo: async (itemId: string) => ({}),
-  transferLandOwnership: async (itemId: string, ipfsHash: string) => {},
+  transferLandOwnership: async (
+    itemId: string,
+    ipfsHash: string,
+    cnic: string
+  ) => {},
   userAddress: "",
   err: null,
   loading: false,

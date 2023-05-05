@@ -166,4 +166,4 @@ const Navigation = (props: Props) => {
   );
 };
 
-export default withAuth(Navigation);
+export default Navigation;

@@ -45,11 +45,10 @@ import { useUserInfo } from "../../../common/context/UserInfoContext";
 import withAuth from "../../../@core/HOC/withAuth";
 
 const DisabledTextField = styled(TextField)({
-  '& .Mui-disabled': {
-    '-webkit-text-fill-color': '#000 !important',
+  "& .Mui-disabled": {
+    "-webkit-text-fill-color": "#000 !important",
   },
 });
-
 
 const UserAccountInfo = () => {
   // ** States
@@ -98,6 +97,7 @@ const UserAccountInfo = () => {
       await addNewAdmin(account);
       await fetchUserBlockchainInfo();
     }
+    router.push("/dashboard/users/");
   };
 
   return (

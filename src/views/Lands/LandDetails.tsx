@@ -293,8 +293,10 @@ const LandDetails = ({
           <Grid item xs={12}>
             <MapDrawShape
               shape={formState.mapPoints}
+              disabled={disableFields || false}
               onDrawShape={(shape) => {
-                onChange({ target: { name: "mapPoints", value: shape } });
+                if (onChange)
+                  onChange({ target: { name: "mapPoints", value: shape } });
               }}
             />
           </Grid>
