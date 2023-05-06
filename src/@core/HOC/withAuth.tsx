@@ -18,6 +18,7 @@ const withAuth = (Component, role: ROLES | "all" = "all") => {
         if (!!address) {
           refreshLogin(address, true);
         } else {
+          console.log(Component);
           return router.push(URLS.login);
         }
         setLoading(false);

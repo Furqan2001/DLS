@@ -214,7 +214,7 @@ const LandingPage = () => {
           {loading && <CircularProgress color="secondary" />}
 
           {showLandTable && landRecords.length ? (
-            <LandTable data={landRecords} redirectUrl={URLS.newOwnerships} />
+            <LandTable data={landRecords} redirectUrl={URLS.allLands} />
           ) : null}
 
           {showLandTable && !landRecords.length && (

@@ -131,26 +131,30 @@ const UserDropdown = () => {
           </Box>
         </Box>
         <Divider sx={{ mt: 0, mb: 1 }} />
-        <MenuItem
-          sx={{ p: 0 }}
-          onClick={() => handleDropdownClose(URLS.profile)}
-        >
-          <Box sx={styles}>
-            <AccountOutline sx={{ marginRight: 2 }} />
-            Profile
-          </Box>
-        </MenuItem>
+        {userAddress && (
+          <>
+            <MenuItem
+              sx={{ p: 0 }}
+              onClick={() => handleDropdownClose(URLS.profile)}
+            >
+              <Box sx={styles}>
+                <AccountOutline sx={{ marginRight: 2 }} />
+                Profile
+              </Box>
+            </MenuItem>
 
-        <MenuItem sx={{ py: 2 }} onClick={logout}>
-          <LogoutVariant
-            sx={{
-              marginRight: 2,
-              fontSize: "1.375rem",
-              color: "text.secondary",
-            }}
-          />
-          Logout
-        </MenuItem>
+            <MenuItem sx={{ py: 2 }} onClick={logout}>
+              <LogoutVariant
+                sx={{
+                  marginRight: 2,
+                  fontSize: "1.375rem",
+                  color: "text.secondary",
+                }}
+              />
+              Logout
+            </MenuItem>
+          </>
+        )}
       </Menu>
     </Fragment>
   );
