@@ -1,1 +1,0 @@
-export const DLSAddress = "0x21FdFB713ddA9b9535bFC9AE2B7B961116fd6077";
