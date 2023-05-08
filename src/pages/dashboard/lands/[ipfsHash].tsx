@@ -59,6 +59,7 @@ import { getLandRecordStatus, isEmptyObject } from "../../../@core/helpers";
 import LandStatusActionButton from "../../../views/Lands/LandStatusActionButton";
 import CustomModal from "../../../@core/components/shared/CustomModal";
 import { sendMail } from "../../../common/api/sendMail";
+import EmailVerification from "../../../views/Ownership/EmailVerification";
 
 const LandDetail = () => {
   const router = useRouter();
@@ -66,10 +67,13 @@ const LandDetail = () => {
   const [landRecord, setLandRecord] = useState<ILandRecord>();
   const [showRejectionBox, setShowRejectionBox] = useState(false);
   const [rejectionBoxMsg, setRejectionBoxMsg] = useState("");
+  const [showEmailVerificationBox, setShowEmailVerificationBox] =
+    useState(true);
 
   const { userRole } = useUserInfo();
 
   const { ipfsHash, itemId } = router.query;
+
   const {
     approveProperty,
     rejectProperty,
@@ -157,82 +161,106 @@ const LandDetail = () => {
     if (!contractErr) router.push(URLS.allLands);
   };
 
+  const shouldShowEmailVerificationBox = ![
+    ROLES.admin,
+    ROLES.moderator,
+  ].includes(userRole);
+
   return (
     <>
-      <Card>
-        <CardHeader
-          title="Land Details"
-          titleTypographyProps={{ variant: "h6" }}
+      {!true ? (
+        <div>Please wait ....</div>
+      ) : shouldShowEmailVerificationBox && showEmailVerificationBox ? (
+        <EmailVerification
+          setShowLandRecord={() => {
+            setShowEmailVerificationBox(false);
+          }}
+          email={formState?.owner_email}
         />
+      ) : (
+        <>
+          <Card>
+            <CardHeader
+              title="Land Details"
+              titleTypographyProps={{ variant: "h6" }}
+            />
 
-        {formState && (
-          <>
-            <Divider />
-            <CardContent>
-              <LandDetails hideFileField disableFields formState={formState} />
-              <Typography fontSize={12}>
-                Each action will take approx 2-3 mins, so please wait after
-                pressing the button. So if you see no changes even after 2-3
-                mins, then please wait more 5-10 mins
-              </Typography>
-            </CardContent>
+            {formState && (
+              <>
+                <Divider />
+                <CardContent>
+                  <LandDetails
+                    hideFileField
+                    disableFields
+                    formState={formState}
+                  />
+                  <Typography fontSize={12}>
+                    Each action will take approx 2-3 mins, so please wait after
+                    pressing the button. So if you see no changes even after 2-3
+                    mins, then please wait more 5-10 mins
+                  </Typography>
+                </CardContent>
 
-            <CardActions>
-              <LandStatusActionButton
-                contractActionLoading={contractActionLoading}
-                handleAction={handleAction}
-                landStatus={landRecord?.status}
-                itemId={itemId as string}
-                isAdmin={userRole === ROLES.admin}
-                showOwnlyPreviousHistoryBtn={!!formState.previous_onwers_hashes}
-              />
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={formState.certificate}
-                style={{ marginLeft: 10 }}
-              >
-                Check Certificate
-              </a>
-            </CardActions>
-            {contractErr && (
-              <Alert color="error" sx={{ ml: 1 }}>
-                {contractErr}
-              </Alert>
+                <CardActions>
+                  <LandStatusActionButton
+                    contractActionLoading={contractActionLoading}
+                    handleAction={handleAction}
+                    landStatus={landRecord?.status}
+                    itemId={itemId as string}
+                    isAdmin={userRole === ROLES.admin}
+                    showOwnlyPreviousHistoryBtn={
+                      !!formState.previous_onwers_hashes
+                    }
+                  />
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href={formState.certificate}
+                    style={{ marginLeft: 10 }}
+                  >
+                    Check Certificate
+                  </a>
+                </CardActions>
+                {contractErr && (
+                  <Alert color="error" sx={{ ml: 1 }}>
+                    {contractErr}
+                  </Alert>
+                )}
+              </>
             )}
-          </>
-        )}
-      </Card>
+          </Card>
 
-      <CustomModal
-        open={showRejectionBox}
-        handleClose={() => setShowRejectionBox(false)}
-      >
-        <Box>
-          <Typography sx={{ fontWeight: "bold" }}>
-            Enter a message why are you rejecting the property?
-          </Typography>
-
-          <TextField
-            sx={{ mt: 4, mb: 2 }}
-            multiline
-            minRows={2}
-            label="Message"
-            fullWidth
-            value={rejectionBoxMsg}
-            onChange={(e) => setRejectionBoxMsg(e.target.value)}
-            placeholder="Enter a message why are you rejecting the property?"
-          />
-
-          <LoadingButton
-            fullWidth
-            onClick={handleReject}
-            loading={contractActionLoading}
+          <CustomModal
+            open={showRejectionBox}
+            handleClose={() => setShowRejectionBox(false)}
           >
-            Submit
-          </LoadingButton>
-        </Box>
-      </CustomModal>
+            <Box>
+              <Typography sx={{ fontWeight: "bold" }}>
+                Enter a message why are you rejecting the property?
+              </Typography>
+
+              <TextField
+                sx={{ mt: 4, mb: 2 }}
+                multiline
+                minRows={2}
+                label="Message"
+                fullWidth
+                value={rejectionBoxMsg}
+                onChange={(e) => setRejectionBoxMsg(e.target.value)}
+                placeholder="Enter a message why are you rejecting the property?"
+              />
+
+              <LoadingButton
+                fullWidth
+                onClick={handleReject}
+                loading={contractActionLoading}
+              >
+                Submit
+              </LoadingButton>
+            </Box>
+          </CustomModal>
+        </>
+      )}
     </>
   );
 };
