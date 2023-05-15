@@ -72,6 +72,8 @@ const LoginPage = () => {
       className="content-center"
       sx={{
         background: "url(/images/background.png)",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
       }}
     >
       <Card sx={{ zIndex: 1 }}>
