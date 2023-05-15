@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  excludeFile: (str) => /\*.{e2e.spec.ts}/.test(str),
   experimental: {
     appDir: false,
   },
