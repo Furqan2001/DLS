@@ -26,7 +26,6 @@ import EyeOffOutline from "mdi-material-ui/EyeOffOutline";
 import { Wallet } from "mdi-material-ui";
 // ** Configs
 import themeConfig from "src/configs/themeConfig";
-
 // ** Layout Import
 import BlankLayout from "src/@core/layouts/BlankLayout";
 
