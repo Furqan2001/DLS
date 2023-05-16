@@ -57,7 +57,7 @@ const UserAccountInfo = () => {
     useState<IBlockchainUserInfo>();
 
   const router = useRouter();
-  const { contract } = useDLSContext();
+  const { contract, loading } = useDLSContext();
 
   const { accountAddress } = router.query;
 
@@ -97,6 +97,7 @@ const UserAccountInfo = () => {
       await addNewAdmin(account);
       await fetchUserBlockchainInfo();
     }
+
     router.push("/dashboard/users/");
   };
 
@@ -212,6 +213,7 @@ const UserAccountInfo = () => {
                           type="submit"
                           variant="contained"
                           size="large"
+                          loading={loading}
                           onClick={onClickBtn}
                         >
                           {blockchainUserInfo.role === ROLES.visitor

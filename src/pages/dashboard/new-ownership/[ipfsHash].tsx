@@ -143,6 +143,7 @@ const LandDetail = () => {
             setShowEmailVerificationBox(false);
           }}
           email={formState.owner_email}
+          subject="Ownership Transfer Confirmation"
         />
       )}
       {shouleShowLandRecord && (

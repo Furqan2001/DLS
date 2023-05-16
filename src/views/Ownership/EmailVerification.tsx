@@ -17,10 +17,11 @@ import LoadingButton from "../../@core/components/shared/LoadingButton";
 
 interface IProps {
   email: string;
+  subject: string;
   setShowLandRecord: (val?: boolean) => void;
 }
 
-const EmailVerification = ({ email, setShowLandRecord }) => {
+const EmailVerification = ({ email, setShowLandRecord, subject }: IProps) => {
   const [showEnterCodeInput, setShowEnterCodeInput] = useState(false);
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,7 +32,7 @@ const EmailVerification = ({ email, setShowLandRecord }) => {
     try {
       await sendEmailConfirmation({
         to: email,
-        subject: "Onwership transfer confirmation",
+        subject: subject,
         message: "Your verification code is: ",
       });
       setShowEnterCodeInput(true);

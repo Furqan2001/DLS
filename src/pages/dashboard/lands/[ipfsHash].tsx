@@ -176,6 +176,7 @@ const LandDetail = () => {
             setShowEmailVerificationBox(false);
           }}
           email={formState?.owner_email}
+          subject="Land Record Access"
         />
       ) : (
         <>
