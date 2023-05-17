@@ -57,7 +57,8 @@ const UserAccountInfo = () => {
     useState<IBlockchainUserInfo>();
 
   const router = useRouter();
-  const { contract, loading } = useDLSContext();
+  const { contract } = useDLSContext();
+  const [loading, setLoading] = useState(false);
 
   const { accountAddress } = router.query;
 
@@ -88,6 +89,7 @@ const UserAccountInfo = () => {
 
   const onClickBtn = async () => {
     const account = accountAddress as string;
+    setLoading(true);
     if (blockchainUserInfo.role === ROLES.visitor) {
       // visitor can only convert to Moderxator
       await addNewModerator(account);
@@ -97,7 +99,7 @@ const UserAccountInfo = () => {
       await addNewAdmin(account);
       await fetchUserBlockchainInfo();
     }
-
+    setLoading(false);
     router.push("/dashboard/users/");
   };
 
